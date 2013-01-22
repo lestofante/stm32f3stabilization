@@ -8,7 +8,7 @@ RCC_ClocksTypeDef RCC_Clocks;
 __IO uint32_t UserButtonPressed = 0;
 __IO float HeadingValue = 0.0f;
 
-float MagBuffer[3] = {0.0f}, AccBuffer[3] = {0.0f}, GyroBuffer[3] = {0.0f};
+uint16_t MagBuffer[3] = {0}, AccBuffer[3] = {0}, GyroBuffer[3] = {0};
 
 int main(void)
 {
@@ -78,7 +78,7 @@ int main(void)
 
 			printf("G");
 			a = GyroBuffer;
-			for(i = 0; i < sizeof(float)*3; i++)
+			for(i = 0; i < sizeof(uint16_t)*3; i++)
 			    printf("%c", a[i]);
 
 			lastTimeUpGyro = micros();
@@ -91,7 +91,7 @@ int main(void)
 
 			printf("A");
 			a = AccBuffer;
-			for(i = 0; i < sizeof(float)*3; i++)
+			for(i = 0; i < sizeof(uint16_t)*3; i++)
 			    printf("%c", a[i]);
 
 			lastTimeUpAcc = micros();
@@ -106,7 +106,7 @@ int main(void)
 
 			printf("M");
 			a = MagBuffer;
-			for(i = 0; i < sizeof(float)*3; i++)
+			for(i = 0; i < sizeof(uint16_t)*3; i++)
 			    printf("%c", a[i]);
 
 			lastTimeUpMagne = micros();
