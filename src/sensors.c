@@ -30,10 +30,11 @@ uint8_t i = 0;
  */
 void Gyro_Config(void)
 {
+
+	/*
 	L3GD20_InitTypeDef L3GD20_InitStructure;
 	L3GD20_FilterConfigTypeDef L3GD20_FilterStructure;
 
-	/* Configure Mems L3GD20 */
 	L3GD20_InitStructure.Power_Mode = L3GD20_MODE_ACTIVE;
 	L3GD20_InitStructure.Output_DataRate = L3GD20_OUTPUT_DATARATE_4;
 	L3GD20_InitStructure.Axes_Enable = L3GD20_AXES_ENABLE;
@@ -48,6 +49,25 @@ void Gyro_Config(void)
 	L3GD20_FilterConfig(&L3GD20_FilterStructure) ;
 
 	L3GD20_FilterCmd(L3GD20_HIGHPASSFILTER_ENABLE);
+	*/
+	L3GD20_InitTypeDef L3GD20_InitStructure;
+	  L3GD20_FilterConfigTypeDef L3GD20_FilterStructure;
+
+	  /* Configure Mems L3GD20 */
+	  L3GD20_InitStructure.Power_Mode = L3GD20_MODE_ACTIVE;
+	  L3GD20_InitStructure.Output_DataRate = L3GD20_OUTPUT_DATARATE_1; //95Hz, cut off 25
+	  L3GD20_InitStructure.Axes_Enable = L3GD20_AXES_ENABLE;
+	  L3GD20_InitStructure.Band_Width = L3GD20_BANDWIDTH_4;
+	  L3GD20_InitStructure.BlockData_Update = L3GD20_BlockDataUpdate_Continous;
+	  L3GD20_InitStructure.Endianness = L3GD20_BLE_MSB;
+	  L3GD20_InitStructure.Full_Scale = L3GD20_FULLSCALE_500;
+	  L3GD20_Init(&L3GD20_InitStructure);
+
+	  L3GD20_FilterStructure.HighPassFilter_Mode_Selection =L3GD20_HPM_NORMAL_MODE_RES;
+	  L3GD20_FilterStructure.HighPassFilter_CutOff_Frequency = L3GD20_HPFCF_0;
+	  L3GD20_FilterConfig(&L3GD20_FilterStructure) ;
+
+	  L3GD20_FilterCmd(L3GD20_HIGHPASSFILTER_ENABLE);
 }
 
 /**
@@ -57,14 +77,42 @@ void Gyro_Config(void)
  */
 void Gyro_ReadAngRate (uint16_t* pfData)
 {
+	uint8_t tmpbuffer[6] ={0};
+	  int16_t RawData[3] = {0};
+	  uint8_t tmpreg = 0;
+	  float sensitivity = 0;
+	  int i =0;
 
+	  L3GD20_Read(&tmpreg,L3GD20_CTRL_REG4_ADDR,1);
+
+	  L3GD20_Read(tmpbuffer,L3GD20_OUT_X_L_ADDR,6);
+
+	  /* check in the control register 4 the data alignment (Big Endian or Little Endian)*/
+	  if(!(tmpreg & 0x40))
+	  {
+	    for(i=0; i<3; i++)
+	    {
+	    	pfData[i]=(int16_t)(((uint16_t)tmpbuffer[2*i+1] << 8) + tmpbuffer[2*i]);
+	    }
+	  }
+	  else
+	  {
+	    for(i=0; i<3; i++)
+	    {
+	    	pfData[i]=(int16_t)(((uint16_t)tmpbuffer[2*i] << 8) + tmpbuffer[2*i+1]);
+	    }
+	  }
+
+	/*
 	L3GD20_Read(buffer,L3GD20_OUT_X_L_ADDR,6);
 
-	/* check in the control register 4 the data alignment (Big Endian or Little Endian)*/
+
 	for(i=0; i<3; i++)
 	{
 		pfData[i]=(int16_t)(((uint16_t)buffer[2*i+1] << 8) + buffer[2*i]);
 	}
+
+*/
 }
 
 /**
@@ -88,6 +136,7 @@ void Compass_Config(void)
 	LSM303DLHC_MagInit(&LSM303DLHC_InitStructure);
 
 	/* Fill the accelerometer structure */
+	/*
 	LSM303DLHCAcc_InitStructure.Power_Mode = LSM303DLHC_NORMAL_MODE;
 	LSM303DLHCAcc_InitStructure.AccOutput_DataRate = LSM303DLHC_ODR_1344_HZ;
 	LSM303DLHCAcc_InitStructure.Axes_Enable= LSM303DLHC_AXES_ENABLE;
@@ -95,17 +144,37 @@ void Compass_Config(void)
 	LSM303DLHCAcc_InitStructure.BlockData_Update = LSM303DLHC_BlockUpdate_Continous;
 	LSM303DLHCAcc_InitStructure.Endianness=LSM303DLHC_BLE_LSB;
 	LSM303DLHCAcc_InitStructure.High_Resolution=LSM303DLHC_HR_ENABLE;
-	/* Configure the accelerometer main parameters */
+
 	LSM303DLHC_AccInit(&LSM303DLHCAcc_InitStructure);
 
-	/* Fill the accelerometer LPF structure */
+
 	LSM303DLHCFilter_InitStructure.HighPassFilter_Mode_Selection =LSM303DLHC_HPM_NORMAL_MODE;
 	LSM303DLHCFilter_InitStructure.HighPassFilter_CutOff_Frequency = LSM303DLHC_HPFCF_16;
 	LSM303DLHCFilter_InitStructure.HighPassFilter_AOI1 = LSM303DLHC_HPF_AOI1_DISABLE;
 	LSM303DLHCFilter_InitStructure.HighPassFilter_AOI2 = LSM303DLHC_HPF_AOI2_DISABLE;
 
-	/* Configure the accelerometer LPF main parameters */
+
 	LSM303DLHC_AccFilterConfig(&LSM303DLHCFilter_InitStructure);
+	*/
+	 /* Fill the accelerometer structure */
+	  LSM303DLHCAcc_InitStructure.Power_Mode = LSM303DLHC_NORMAL_MODE;
+	  LSM303DLHCAcc_InitStructure.AccOutput_DataRate = LSM303DLHC_ODR_50_HZ;
+	  LSM303DLHCAcc_InitStructure.Axes_Enable= LSM303DLHC_AXES_ENABLE;
+	  LSM303DLHCAcc_InitStructure.AccFull_Scale = LSM303DLHC_FULLSCALE_4G;
+	  LSM303DLHCAcc_InitStructure.BlockData_Update = LSM303DLHC_BlockUpdate_Continous;
+	  LSM303DLHCAcc_InitStructure.Endianness=LSM303DLHC_BLE_MSB;
+	  LSM303DLHCAcc_InitStructure.High_Resolution=LSM303DLHC_HR_ENABLE;
+	  /* Configure the accelerometer main parameters */
+	  LSM303DLHC_AccInit(&LSM303DLHCAcc_InitStructure);
+
+	  /* Fill the accelerometer LPF structure */
+	  LSM303DLHCFilter_InitStructure.HighPassFilter_Mode_Selection =LSM303DLHC_HPM_NORMAL_MODE;
+	  LSM303DLHCFilter_InitStructure.HighPassFilter_CutOff_Frequency = LSM303DLHC_HPFCF_16;
+	  LSM303DLHCFilter_InitStructure.HighPassFilter_AOI1 = LSM303DLHC_HPF_AOI1_DISABLE;
+	  LSM303DLHCFilter_InitStructure.HighPassFilter_AOI2 = LSM303DLHC_HPF_AOI2_DISABLE;
+
+	  /* Configure the accelerometer LPF main parameters */
+	  LSM303DLHC_AccFilterConfig(&LSM303DLHCFilter_InitStructure);
 }
 
 /**
@@ -151,7 +220,7 @@ void Compass_ReadMag (uint16_t* pfData)
 	{
 		pfData[i]=((int16_t)((uint16_t)buffer[2*i+1] << 8) + buffer[2*i]);
 	}
-	pfData[2]*= magnetometerZtoXY; //because Z has different sensitivity
+	//pfData[2]*= magnetometerZtoXY; //because Z has different sensitivity
 }
 
 

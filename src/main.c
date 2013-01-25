@@ -66,8 +66,6 @@ int main(void)
 
 	int i;
 
-	uint8_t *a;
-
 	while (1)
 	{
 
@@ -77,10 +75,18 @@ int main(void)
 			Gyro_ReadAngRate(GyroBuffer);
 
 			printf("G");
+
+			fwrite(GyroBuffer, sizeof(uint16_t), 3, stdout);
+			/*
 			a = GyroBuffer;
-			for(i = 0; i < sizeof(uint16_t)*3; i++)
+			for(i = 0; i < 6; i++)
 			    printf("%c", a[i]);
 
+			/*
+			for (i=0;i<;i++){
+				printf("%d ",GyroBuffer[i]);
+			}
+			*/
 			lastTimeUpGyro = micros();
 			upG++;
 		}
@@ -90,9 +96,18 @@ int main(void)
 			Compass_ReadAcc(AccBuffer);
 
 			printf("A");
+
+			fwrite(AccBuffer, sizeof(uint16_t), 3, stdout);
+			/*
 			a = AccBuffer;
-			for(i = 0; i < sizeof(uint16_t)*3; i++)
+			for(i = 0; i < 6; i++)
 			    printf("%c", a[i]);
+
+			/*
+			for (i=0;i<3;i++){
+				printf("%d ",AccBuffer[i]);
+			}
+			*/
 
 			lastTimeUpAcc = micros();
 
@@ -105,10 +120,18 @@ int main(void)
 			//printf("M: %f %f %f\n",MagBuffer[0], MagBuffer[1], MagBuffer[2]);
 
 			printf("M");
+
+			fwrite(MagBuffer, sizeof(uint16_t), 3, stdout);
+			/*
 			a = MagBuffer;
-			for(i = 0; i < sizeof(uint16_t)*3; i++)
+			for(i = 0; i < 6; i++)
 			    printf("%c", a[i]);
 
+			/*
+			for (i=0;i<3;i++){
+				printf("%d ",MagBuffer[i]);
+			}
+			*/
 			lastTimeUpMagne = micros();
 
 			upM++;
@@ -118,19 +141,20 @@ int main(void)
 		/* Toggle LD3 */
 		//STM_EVAL_LEDToggle(LED3);
 		//_delay_ms(5);
-
+/*
 		if (micros()-lastTime > 1000000UL){ //1 seconds
 			almostNow = micros()-almostNow;
 			printf("loop duration: %lu\n",almostNow);
 
-			printf("up G %d, A %d, M %d\n",upG, upA, upM);
-			/* Toggle LD10 */
+			//printf("up G %d, A %d, M %d\n",upG, upA, upM);
+			// Toggle LD10
 			STM_EVAL_LEDToggle(LED10);
 
 			upG = upA = upM = 0;
 
 			lastTime = micros();
 		}
+*/
 	}
 
 }

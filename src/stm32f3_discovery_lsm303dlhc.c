@@ -110,6 +110,10 @@ void LSM303DLHC_AccInit(LSM303DLHCAcc_InitTypeDef *LSM303DLHC_InitStruct)
   
   /* Write value to ACC MEMS CTRL_REG4 regsister */
   LSM303DLHC_Write(ACC_I2C_ADDRESS, LSM303DLHC_CTRL_REG4_A, &ctrl4);
+
+  //set bypass mode
+  uint8_t fifo=0x00;
+  LSM303DLHC_Write(ACC_I2C_ADDRESS, LSM303DLHC_FIFO_CTRL_REG_A, &fifo);
 }
 
 /**
