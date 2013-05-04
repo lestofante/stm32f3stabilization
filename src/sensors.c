@@ -78,41 +78,20 @@ void Gyro_Config(void)
 void Gyro_ReadAngRate (uint16_t* pfData)
 {
 	uint8_t tmpbuffer[6] ={0};
-	  int16_t RawData[3] = {0};
-	  uint8_t tmpreg = 0;
-	  float sensitivity = 0;
-	  int i =0;
+	int16_t RawData[3] = {0};
+	uint8_t tmpreg = 0;
+	float sensitivity = 0;
+	int i =0;
 
-	  L3GD20_Read(&tmpreg,L3GD20_CTRL_REG4_ADDR,1);
+	L3GD20_Read(&tmpreg,L3GD20_CTRL_REG4_ADDR,1);
 
-	  L3GD20_Read(tmpbuffer,L3GD20_OUT_X_L_ADDR,6);
-
-	  /* check in the control register 4 the data alignment (Big Endian or Little Endian)*/
-	  if(!(tmpreg & 0x40))
-	  {
-	    for(i=0; i<3; i++)
-	    {
-	    	pfData[i]=(int16_t)(((uint16_t)tmpbuffer[2*i+1] << 8) + tmpbuffer[2*i]);
-	    }
-	  }
-	  else
-	  {
-	    for(i=0; i<3; i++)
-	    {
-	    	pfData[i]=(int16_t)(((uint16_t)tmpbuffer[2*i] << 8) + tmpbuffer[2*i+1]);
-	    }
-	  }
-
-	/*
-	L3GD20_Read(buffer,L3GD20_OUT_X_L_ADDR,6);
+	L3GD20_Read(tmpbuffer,L3GD20_OUT_X_L_ADDR,6);
 
 
 	for(i=0; i<3; i++)
 	{
-		pfData[i]=(int16_t)(((uint16_t)buffer[2*i+1] << 8) + buffer[2*i]);
+		pfData[i]=(int16_t)(((uint16_t)tmpbuffer[2*i+1] << 8) + tmpbuffer[2*i]);
 	}
-
-*/
 }
 
 /**
@@ -218,9 +197,9 @@ void Compass_ReadMag (uint16_t* pfData)
 
 	for(i=0; i<3; i++)
 	{
-		pfData[i]=((int16_t)((uint16_t)buffer[2*i+1] << 8) + buffer[2*i]);
+		pfData[i]=((int16_t)((uint16_t)buffer[2*i] << 8) + buffer[2*i+1]);
 	}
-	//pfData[2]*= magnetometerZtoXY; //because Z has different sensitivity
+	//pfData[1]*= magnetometerZtoXY; //because Z has different sensitivity
 }
 
 

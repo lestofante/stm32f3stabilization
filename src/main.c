@@ -1,167 +1,325 @@
-#include "common.h"
-#include "sensors.h"
-#include "usart.h"
+/**
+ ******************************************************************************
+ * @file    USB_Example/main.c
+ * @author  MCD Application Team
+ * @version V1.1.0
+ * @date    20-September-2012
+ * @brief   Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+ *
+ * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *        http://www.st.com/software_license_agreement_liberty_v2
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************
+ */
 
 
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#include "usb_main.h"
+
+//#include "arm_math.h"
+
+/** @addtogroup STM32F3_Discovery_Peripheral_Examples
+ * @
+ */
+
+/** @addtogroup USB_Example
+ * @{
+ */
+
+/* Private typedef -----------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+/* Private macro -------------------------------------------------------------*/
+#define PI                         (float)     3.14159265f
+
+#define LSM_Acc_Sensitivity_2g     (float)     1.0f            /*!< accelerometer sensitivity with 2 g full scale [LSB/mg] */
+#define LSM_Acc_Sensitivity_4g     (float)     0.5f            /*!< accelerometer sensitivity with 4 g full scale [LSB/mg] */
+#define LSM_Acc_Sensitivity_8g     (float)     0.25f           /*!< accelerometer sensitivity with 8 g full scale [LSB/mg] */
+#define LSM_Acc_Sensitivity_16g    (float)     0.0834f         /*!< accelerometer sensitivity with 12 g full scale [LSB/mg] */
+
+/* Private variables ---------------------------------------------------------*/
 RCC_ClocksTypeDef RCC_Clocks;
+__IO uint32_t TimingDelay = 0;
 
-__IO uint32_t UserButtonPressed = 0;
-__IO float HeadingValue = 0.0f;
+float  AccBuffer[3] = {0.0f};
 
-uint16_t MagBuffer[3] = {0}, AccBuffer[3] = {0}, GyroBuffer[3] = {0};
+__IO uint8_t DataReady = 0;
 
-int main(void)
-{
-	/* SysTick end of count event each 1us */
-	RCC_GetClocksFreq(&RCC_Clocks);
-	SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000000UL);
+uint16_t bytes = 0;
+uint8_t *Mouse_Buffer;
 
-	/* Initialize LEDs */
-	STM_EVAL_LEDInit(LED3);
-	STM_EVAL_LEDInit(LED4);
-	STM_EVAL_LEDInit(LED5);
-	STM_EVAL_LEDInit(LED6);
-	STM_EVAL_LEDInit(LED7);
-	STM_EVAL_LEDInit(LED8);
-	STM_EVAL_LEDInit(LED9);
-	STM_EVAL_LEDInit(LED10);
+/* Private function prototypes -----------------------------------------------*/
+/* Private functions ---------------------------------------------------------*/
 
-	/* Initialize pushbutton */
-	STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
-
-
-
-	USART2_Init(460800);
-	printf("\fUART2 initialized\n\r");
-
-	/*
-	while(1){
-		printf("ciao!\n");
-	}
-	 */
-
-	int8_t readGiroscopio = 1;
-	int8_t readAccelerometro = 1;
-	int8_t readMagnetometro = 1;
-
-
-	/* Reset UserButton_Pressed variable */
-	UserButtonPressed = 0x00;
-
-	/* Initialize gyro */
-	Gyro_Config();
-
-	/* Initialize compass */
-	Compass_Config(); //
-
-	uint32_t lastTime, lastTimeUpGyro, lastTimeUpAcc, lastTimeUpMagne;
-	uint32_t almostNow=micros();
-
-
-
-	lastTime = lastTimeUpGyro = lastTimeUpAcc = lastTimeUpMagne = micros();
-	uint8_t upG, upA, upM;
-
-	upG = upA = upM = 0;
-
-	int i;
-
-	while (1)
-	{
-
-		almostNow = micros();
-		if (readGiroscopio && micros() - lastTimeUpGyro > 1316){ //should be at 760Hz, so wait for 1316 uSec
-			/* Read Gyro data */
-			Gyro_ReadAngRate(GyroBuffer);
-
-			printf("G");
-
-			fwrite(GyroBuffer, sizeof(uint16_t), 3, stdout);
-			/*
-			a = GyroBuffer;
-			for(i = 0; i < 6; i++)
-			    printf("%c", a[i]);
-
-			/*
-			for (i=0;i<;i++){
-				printf("%d ",GyroBuffer[i]);
-			}
-			*/
-			lastTimeUpGyro = micros();
-			upG++;
-		}
-
-		if (readAccelerometro && micros() - lastTimeUpAcc > 745){ //should be at 1344Hz, so wait for 745 uSec
-			/* Read Accelerometer data */
-			Compass_ReadAcc(AccBuffer);
-
-			printf("A");
-
-			fwrite(AccBuffer, sizeof(uint16_t), 3, stdout);
-			/*
-			a = AccBuffer;
-			for(i = 0; i < 6; i++)
-			    printf("%c", a[i]);
-
-			/*
-			for (i=0;i<3;i++){
-				printf("%d ",AccBuffer[i]);
-			}
-			*/
-
-			lastTimeUpAcc = micros();
-
-			upA++;
-		}
-
-		if (readMagnetometro && micros() - lastTimeUpMagne > 4546){ //should be at 220Hz, so wait for 4546 uSec
-			/* Read Magnetometer data */
-			Compass_ReadMag(MagBuffer);
-			//printf("M: %f %f %f\n",MagBuffer[0], MagBuffer[1], MagBuffer[2]);
-
-			printf("M");
-
-			fwrite(MagBuffer, sizeof(uint16_t), 3, stdout);
-			/*
-			a = MagBuffer;
-			for(i = 0; i < 6; i++)
-			    printf("%c", a[i]);
-
-			/*
-			for (i=0;i<3;i++){
-				printf("%d ",MagBuffer[i]);
-			}
-			*/
-			lastTimeUpMagne = micros();
-
-			upM++;
-		}
-
-
-		/* Toggle LD3 */
-		//STM_EVAL_LEDToggle(LED3);
-		//_delay_ms(5);
 /*
-		if (micros()-lastTime > 1000000UL){ //1 seconds
-			almostNow = micros()-almostNow;
-			printf("loop duration: %lu\n",almostNow);
+static uint8_t *getBuffer2 (void)
+{
+	static int temp[64] = {0};
+	int j = 0;
 
-			//printf("up G %d, A %d, M %d\n",upG, upA, upM);
-			// Toggle LD10
-			STM_EVAL_LEDToggle(LED10);
+	float asd = asin(3);
 
-			upG = upA = upM = 0;
+	for(j=0; j<64; j++){
 
-			lastTime = micros();
-		}
-*/
+		if(j%8==0)
+			temp[j]= -32768;
+
+		if(j%8==1)
+			temp[j]= -16384;
+
+		if(j%8==2)
+			temp[j]= 0;
+
+		if(j%8==3)
+			temp[j]= 16384;
+
+		if(j%8==4)
+			temp[j]= 32767;
+
+		if(j%8==5)
+			temp[j]= 16384;
+
+		if(j%8==6)
+			temp[j]= 0;
+
+		if(j%8==7)
+			temp[j]= -16384;
 	}
 
+	static uint8_t HID_Buffer[128] = {0};
+	int i = 0;
+	for(i = 0; i<128; i+=2){
+		HID_Buffer[i] = (uint8_t)(temp[i/2]>>8);
+		HID_Buffer[i+1] = (uint8_t)temp[i/2];
+	}
+
+	return HID_Buffer;
+}
+ */
+/**
+ * @brief  USBD_HID_GetPos
+ * @param  None
+ * @retval Pointer to report
+ */
+/*
+static uint8_t *USBD_HID_GetPos (void)
+{
+	static uint8_t HID_Buffer[16] = {0};
+
+	HID_Buffer[0] = 65;
+	HID_Buffer[1] = 66;
+	HID_Buffer[2] = 67;
+	HID_Buffer[3] = 68;
+
+	HID_Buffer[4] = 69;
+	HID_Buffer[5] = 70;
+	HID_Buffer[6] = 71;
+	HID_Buffer[7] = 72;
+
+	HID_Buffer[8] = 73;
+	HID_Buffer[9] = 74;
+	HID_Buffer[10] = 75;
+	HID_Buffer[11] = 76;
+
+	HID_Buffer[12] = 77;
+	HID_Buffer[13] = 78;
+	HID_Buffer[14] = 79;
+	HID_Buffer[15] = 80;
+
+
+	return HID_Buffer;
+}
+*/
+/**
+ * @brief  Configure the Mems to Accelerometer MEMS.
+ * @param  None
+ * @retval None
+ */
+void Acc_Config(void)
+{
+	LSM303DLHCAcc_InitTypeDef LSM303DLHCAcc_InitStructure;
+	LSM303DLHCAcc_FilterConfigTypeDef LSM303DLHCFilter_InitStructure;
+
+	/* Fill the accelerometer structure */
+	LSM303DLHCAcc_InitStructure.Power_Mode = LSM303DLHC_NORMAL_MODE;
+	LSM303DLHCAcc_InitStructure.AccOutput_DataRate = LSM303DLHC_ODR_50_HZ;
+	LSM303DLHCAcc_InitStructure.Axes_Enable= LSM303DLHC_AXES_ENABLE;
+	LSM303DLHCAcc_InitStructure.AccFull_Scale = LSM303DLHC_FULLSCALE_2G;
+	LSM303DLHCAcc_InitStructure.BlockData_Update = LSM303DLHC_BlockUpdate_Continous;
+	LSM303DLHCAcc_InitStructure.Endianness=LSM303DLHC_BLE_LSB;
+	LSM303DLHCAcc_InitStructure.High_Resolution=LSM303DLHC_HR_ENABLE;
+	/* Configure the accelerometer main parameters */
+	LSM303DLHC_AccInit(&LSM303DLHCAcc_InitStructure);
+
+	/* Fill the accelerometer LPF structure */
+	LSM303DLHCFilter_InitStructure.HighPassFilter_Mode_Selection =LSM303DLHC_HPM_NORMAL_MODE;
+	LSM303DLHCFilter_InitStructure.HighPassFilter_CutOff_Frequency = LSM303DLHC_HPFCF_16;
+	LSM303DLHCFilter_InitStructure.HighPassFilter_AOI1 = LSM303DLHC_HPF_AOI1_DISABLE;
+	LSM303DLHCFilter_InitStructure.HighPassFilter_AOI2 = LSM303DLHC_HPF_AOI2_DISABLE;
+
+	/* Configure the accelerometer LPF main parameters */
+	LSM303DLHC_AccFilterConfig(&LSM303DLHCFilter_InitStructure);
+}
+
+/**
+ * @brief Read LSM303DLHC output register, and calculate the acceleration ACC=(1/SENSITIVITY)* (out_h*256+out_l)/16 (12 bit rappresentation)
+ * @param pnData: pointer to float buffer where to store data
+ * @retval None
+ */
+void Acc_ReadData(float* pfData)
+{
+	int16_t pnRawData[3];
+	uint8_t ctrlx[2];
+	float LSM_Acc_Sensitivity = LSM_Acc_Sensitivity_2g;
+	uint8_t buffer[6], cDivider;
+	uint8_t i = 0;
+
+	/* Read the register content */
+	LSM303DLHC_Read(ACC_I2C_ADDRESS, LSM303DLHC_CTRL_REG4_A, ctrlx,2);
+	LSM303DLHC_Read(ACC_I2C_ADDRESS, LSM303DLHC_OUT_X_L_A, buffer, 6);
+
+
+	if(ctrlx[1]&0x40)
+		cDivider=64;
+	else
+		cDivider=16;
+
+	/* check in the control register4 the data alignment*/
+	if(!(ctrlx[0] & 0x40) || (ctrlx[1] & 0x40)) /* Little Endian Mode or FIFO mode */
+	{
+		for(i=0; i<3; i++)
+		{
+			pnRawData[i]=((int16_t)((uint16_t)buffer[2*i+1] << 8) + buffer[2*i])/cDivider;
+		}
+	}
+	else /* Big Endian Mode */
+	{
+		for(i=0; i<3; i++)
+			pnRawData[i]=((int16_t)((uint16_t)buffer[2*i] << 8) + buffer[2*i+1])/cDivider;
+	}
+	/* Read the register content */
+	LSM303DLHC_Read(ACC_I2C_ADDRESS, LSM303DLHC_CTRL_REG4_A, ctrlx,2);
+
+
+	if(ctrlx[1]&0x40)
+	{
+		/* FIFO mode */
+		LSM_Acc_Sensitivity = 0.25;
+	}
+	else
+	{
+		/* normal mode */
+		/* switch the sensitivity value set in the CRTL4*/
+		switch(ctrlx[0] & 0x30)
+		{
+		case LSM303DLHC_FULLSCALE_2G:
+			LSM_Acc_Sensitivity = LSM_Acc_Sensitivity_2g;
+			break;
+		case LSM303DLHC_FULLSCALE_4G:
+			LSM_Acc_Sensitivity = LSM_Acc_Sensitivity_4g;
+			break;
+		case LSM303DLHC_FULLSCALE_8G:
+			LSM_Acc_Sensitivity = LSM_Acc_Sensitivity_8g;
+			break;
+		case LSM303DLHC_FULLSCALE_16G:
+			LSM_Acc_Sensitivity = LSM_Acc_Sensitivity_16g;
+			break;
+		}
+	}
+
+	/* Obtain the mg value for the three axis */
+	for(i=0; i<3; i++)
+	{
+		pfData[i]=(float)pnRawData[i]/LSM_Acc_Sensitivity;
+	}
 }
 
 
+/**
+ * @brief  Main program.
+ * @param  None
+ * @retval None
+ */
+int main(void)
+{
+	/* SysTick end of count event each 10ms */
+	RCC_GetClocksFreq(&RCC_Clocks);
+	SysTick_Config(250); //should set interrupt to go off 32000 times a second
 
+	int i;
+/*
+	for(i = 0; i<BUFFER_SIZE; i++){
+		Buffer[i] = i;
+	}
+*/
+	/* Configure the USB */
+	USB_Config();
+/*
+	UserToPMABufferCopy(Buffer, 0x098, 180);
+	UserToPMABufferCopy(Buffer2, 0x14c, 180);
+*/
+	/* Infinite loop */
 
+	Gyro_Config();
+
+	Compass_Config();
+
+	uint16_t temp_sensor_read[3];
+	while (1)
+	{
+		Gyro_ReadAngRate(temp_sensor_read);
+		USB_writeByteBlocking('G');
+		writeSensor(temp_sensor_read);
+
+		Compass_ReadAcc(temp_sensor_read);
+		USB_writeByteBlocking('A');
+		writeSensor(temp_sensor_read);
+
+		asdsadsa
+
+		Compass_ReadMag(temp_sensor_read);
+		USB_writeByteBlocking('M');
+		writeSensor(temp_sensor_read);
+
+		uint32_t ora = micros();
+		while (micros()-ora < 1000000L){//should wait 1 second
+			//do nothing
+		}
+	}
+}
+
+void writeSensor(uint16_t read[3]){
+	for (i=0;i<3;i++){
+		USB_writeByteBlocking(temp_sensor_read[i]>>8);
+		USB_writeByteBlocking(temp_sensor_read[i]);
+	}
+}
+
+/**
+ * @brief  Basic management of the timeout situation.
+ * @param  None.
+ * @retval None.
+ */
+uint32_t LSM303DLHC_TIMEOUT_UserCallback(void)
+{
+	/* Block communication and all processes */
+	while (1)
+	{
+	}
+}
 
 #ifdef  USE_FULL_ASSERT
 
@@ -173,7 +331,7 @@ int main(void)
  * @retval None
  */
 void assert_failed(uint8_t* file, uint32_t line)
-{
+{ 
 	/* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
 
@@ -184,40 +342,12 @@ void assert_failed(uint8_t* file, uint32_t line)
 }
 #endif
 
-
-
-/******************************************************************************/
-/*                 STM32F30x Peripherals Interrupt Handlers                   */
-/*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */
-/*  available peripheral interrupt handler's name please refer to the startup */
-/*  file (startup_stm32f30x.s).                                            */
-/******************************************************************************/
 /**
- * @brief  This function handles EXTI0_IRQ Handler.
- * @param  None
- * @retval None
+ * @}
  */
-void EXTI0_IRQHandler(void)
-{
-	uint32_t i;
-	if ((EXTI_GetITStatus(USER_BUTTON_EXTI_LINE) == SET)&&(STM_EVAL_PBGetState(BUTTON_USER) != RESET))
-	{
-		/* Delay */
-		for(i=0; i<0x7FFFF; i++);
 
-		/* Wait for SEL button to be pressed  */
-		while(STM_EVAL_PBGetState(BUTTON_USER) != RESET);
-		/* Delay */
-		for(i=0; i<0x7FFFF; i++);
-		UserButtonPressed++;
+/**
+ * @}
+ */
 
-		if (UserButtonPressed > 0x2)
-		{
-			UserButtonPressed = 0x0;
-		}
-
-		/* Clear the EXTI line pending bit */
-		EXTI_ClearITPendingBit(USER_BUTTON_EXTI_LINE);
-	}
-}
-
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
