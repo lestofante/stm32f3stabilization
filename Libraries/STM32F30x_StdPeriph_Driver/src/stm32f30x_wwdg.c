@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f30x_wwdg.c
   * @author  MCD Application Team
-  * @version V0.1.0
-  * @date    06-April-2012
+  * @version V1.0.0
+  * @date    04-September-2012
   * @brief   This file provides firmware functions to manage the following 
   *          functionalities of the Window watchdog (WWDG) peripheral:
   *           + Prescaler, Refresh window and Counter configuration

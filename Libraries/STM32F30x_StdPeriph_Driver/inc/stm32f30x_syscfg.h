@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f30x_syscfg.h
   * @author  MCD Application Team
-  * @version V0.1.0
-  * @date    06-April-2012
+  * @version V1.0.0
+  * @date    04-September-2012
   * @brief   This file contains all the functions prototypes for the SYSCFG firmware 
   *          library.
   ******************************************************************************
@@ -163,12 +163,12 @@
 /** @defgroup SYSCFG_EncoderRemap_Config 
   * @{
   */ 
-#define SYSCFG_EncoderRemap_No              ((uint32_t)0x00000000)     /*!< No redirection */
+#define SYSCFG_EncoderRemap_No              ((uint32_t)0x00000000)      /*!< No redirection */
 #define SYSCFG_EncoderRemap_TIM2            SYSCFG_CFGR1_ENCODER_MODE_0 /*!< Timer 2 IC1 and IC2 connected to TIM15 IC1 and IC2 */
 #define SYSCFG_EncoderRemap_TIM3            SYSCFG_CFGR1_ENCODER_MODE_1 /*!< Timer 3 IC1 and IC2 connected to TIM15 IC1 and IC2 */
 #define SYSCFG_EncoderRemap_TIM4            SYSCFG_CFGR1_ENCODER_MODE   /*!< Timer 4 IC1 and IC2 connected to TIM15 IC1 and IC2 */
 
-#define IS_SYSCFG_ENCODER_REMAP(REMAP) (((REMAP) == SYSCFG_EncoderRemap_No)  || \
+#define IS_SYSCFG_ENCODER_REMAP(REMAP) (((REMAP) == SYSCFG_EncoderRemap_No)    || \
                                         ((REMAP) == SYSCFG_EncoderRemap_TIM2)  || \
                                         ((REMAP) == SYSCFG_EncoderRemap_TIM3)  || \
                                         ((REMAP) == SYSCFG_EncoderRemap_TIM4))
@@ -279,7 +279,7 @@ void SYSCFG_I2CFastModePlusConfig(uint32_t SYSCFG_I2CFastModePlus, FunctionalSta
 void SYSCFG_ITConfig(uint32_t SYSCFG_IT, FunctionalState NewState);
 void SYSCFG_EXTILineConfig(uint8_t EXTI_PortSourceGPIOx, uint8_t EXTI_PinSourcex);
 void SYSCFG_BreakConfig(uint32_t SYSCFG_Break);
-void SYSCFG_BypassParityCheckCmd(void);
+void SYSCFG_BypassParityCheckDisable(void);
 void SYSCFG_SRAMWRPEnable(uint32_t SYSCFG_SRAMWRP);
 FlagStatus SYSCFG_GetFlagStatus(uint32_t SYSCFG_Flag);
 void SYSCFG_ClearFlag(uint32_t SYSCFG_Flag);

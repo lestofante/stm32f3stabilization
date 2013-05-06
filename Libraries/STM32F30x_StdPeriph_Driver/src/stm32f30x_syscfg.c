@@ -2,16 +2,18 @@
   ******************************************************************************
   * @file    stm32f30x_syscfg.c
   * @author  MCD Application Team
-  * @version V0.1.0
-  * @date    06-April-2012
+  * @version V1.0.0
+  * @date    04-September-2012
   * @brief   This file provides firmware functions to manage the following 
   *          functionalities of the SYSCFG peripheral:
   *           + Remapping the memory mapped at 0x00000000  
   *           + Remapping the DMA channels
+  *           + Enabling I2C fast mode plus driving capability for I2C plus
+  *           + Remapping USB interrupt line    
   *           + Configuring the EXTI lines connection to the GPIO port
   *           + Configuring the CLASSB requirements
   *   
-  *  @verbatim
+  @verbatim
   
  ===============================================================================
                       ##### How to use this driver #####
@@ -21,7 +23,8 @@
     [..] To enable SYSCFG APB clock use:
          RCC_APBPeriphClockCmd(RCC_APBPeriph_SYSCFG, ENABLE);
   
-    @endverbatim
+  @endverbatim
+  
   ******************************************************************************
   * @attention
   *
@@ -58,6 +61,21 @@
 /* Private define ------------------------------------------------------------*/
 /* Reset value od SYSCFG_CFGR1 register */
 #define CFGR1_CLEAR_MASK            ((uint32_t)0x7C000000)
+
+/* ------------ SYSCFG registers bit address in the alias region -------------*/
+#define SYSCFG_OFFSET                (SYSCFG_BASE - PERIPH_BASE)
+
+/* --- CFGR1 Register ---*/
+/* Alias word address of USB_IT_RMP bit */
+#define CFGR1_OFFSET                 (SYSCFG_OFFSET + 0x00)
+#define USBITRMP_BitNumber            0x05
+#define CFGR1_USBITRMP_BB            (PERIPH_BB_BASE + (CFGR1_OFFSET * 32) + (USBITRMP_BitNumber * 4))
+
+/* --- CFGR2 Register ---*/
+/* Alias word address of BYP_ADDR_PAR bit */
+#define CFGR2_OFFSET                 (SYSCFG_OFFSET + 0x18)
+#define BYPADDRPAR_BitNumber          0x04
+#define CFGR1_BYPADDRPAR_BB          (PERIPH_BB_BASE + (CFGR2_OFFSET * 32) + (BYPADDRPAR_BitNumber * 4))
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -245,16 +263,8 @@ void SYSCFG_USBInterruptLineRemapCmd(FunctionalState NewState)
   /* Check the parameter */
   assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-  if (NewState != DISABLE)
-  {
-    /* Remap the USB interupt lines */
-    SYSCFG->CFGR1 |= (uint32_t)SYSCFG_CFGR1_USB_IT_RMP;
-  }
-  else
-  {
-    /* Use the default USB interupt lines mapping */
-    SYSCFG->CFGR1 &= (uint32_t)(~SYSCFG_CFGR1_USB_IT_RMP);
-  }
+  /* Remap the USB interupt lines */
+  *(__IO uint32_t *) CFGR1_USBITRMP_BB = (uint32_t)NewState;
 }
 
 /**
@@ -377,10 +387,10 @@ void SYSCFG_BreakConfig(uint32_t SYSCFG_Break)
   * @param  None
   * @retval None
   */
-void SYSCFG_BypassParityCheckCmd(void)
+void SYSCFG_BypassParityCheckDisable(void)
 {
   /* Disable the adddress parity check on RAM */
-  SYSCFG->CFGR2 |= (uint32_t)SYSCFG_CFGR2_BYP_ADDR_PAR;
+  *(__IO uint32_t *) CFGR1_BYPADDRPAR_BB = (uint32_t)0x00000001;
 }
 
 /**

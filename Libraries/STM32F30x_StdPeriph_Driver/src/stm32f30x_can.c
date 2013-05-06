@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f30x_can.c
   * @author  MCD Application Team
-  * @version V0.1.0
-  * @date    06-April-2012
+  * @version V1.0.0
+  * @date    04-September-2012
   * @brief   This file provides firmware functions to manage the following 
   *          functionalities of the Controller area network (CAN) peripheral:           
   *           + Initialization and Configuration 
@@ -46,7 +46,7 @@
              using CAN_ClearITPendingBit() function.            
                  
   @endverbatim
-         
+  *       
   ******************************************************************************
   * @attention
   *

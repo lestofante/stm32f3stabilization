@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f30x_comp.h
   * @author  MCD Application Team
-  * @version V0.1.0
-  * @date    06-April-2012
+  * @version V1.0.0
+  * @date    04-September-2012
   * @brief   This file contains all the functions prototypes for the COMP firmware 
   *          library.
   ******************************************************************************
@@ -67,7 +67,7 @@ typedef struct
                                           This parameter can be a value of @ref COMP_BlankingSrce */
 
   uint32_t COMP_OutputPol;           /*!< Selects the output polarity of the comparator.
-                                          This parameter can be a value of @ref COMP_OutputPol */
+                                          This parameter can be a value of @ref COMP_OutputPoloarity */
 
   uint32_t COMP_Hysteresis;         /*!< Selects the hysteresis voltage of the comparator.
                                           This parameter can be a value of @ref COMP_Hysteresis */

@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f30x_dac.c
   * @author  MCD Application Team
-  * @version V0.1.0
-  * @date    06-April-2012
+  * @version V1.0.0
+  * @date    04-September-2012
   * @brief   This file provides firmware functions to manage the following 
   *          functionalities of the Digital-to-Analog Converter (DAC) peripheral: 
   *           + DAC channels configuration: trigger, output buffer, data format
@@ -25,7 +25,7 @@
     [..] Digital to Analog conversion can be triggered by:
          (#) External event: EXTI Line 9 (any GPIOx_Pin9) using DAC_Trigger_Ext_IT9.
              The used pin (GPIOx_Pin9) must be configured in input mode.
-         (#) Timers TRGO: TIM2, TIM8/TIM3*, TIM4, TIM6, TIM7, and TIM15 
+         (#) Timers TRGO: TIM2, TIM8/TIM3, TIM4, TIM6, TIM7, and TIM15 
              (DAC_Trigger_T2_TRGO, DAC_Trigger_T4_TRGO...)
              The timer TRGO event should be selected using TIM_SelectOutputTrigger()
              (++) To trigger DAC conversions by TIM3 instead of TIM8 follow
@@ -33,7 +33,7 @@
                  (+++) Enable SYSCFG APB clock by calling
                        RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
                  (+++) Select DAC_Trigger_T3_TRGO when calling DAC_Init()
-                 (+++) Remap the DAC trigger from TIM8 to TIM3 y calling
+                 (+++) Remap the DAC trigger from TIM8 to TIM3 by calling
                        SYSCFG_TriggerRemapConfig(SYSCFG_TriggerRemap_DACTIM3, ENABLE)
          (#) Software using DAC_Trigger_Software
     [..] Each DAC channel integrates an output buffer that can be used to 

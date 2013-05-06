@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * @file    stm32f30x_conf.h 
+  * @file    USB_Example/stm32f30x_conf.h 
   * @author  MCD Application Team
-  * @version V0.0.2
-  * @date    17-July-2012
+  * @version V1.1.0
+  * @date    20-September-2012
   * @brief   Library configuration file.
   ******************************************************************************
   * @attention

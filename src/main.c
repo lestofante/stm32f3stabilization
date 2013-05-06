@@ -29,6 +29,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_main.h"
+#include "sensors.h"
+#include "common.h"
 
 //#include "arm_math.h"
 
@@ -247,6 +249,13 @@ void Acc_ReadData(float* pfData)
 	}
 }
 
+void writeSensor(uint16_t read[3]){
+	uint8_t i;
+	for (i=0;i<3;i++){
+		USB_writeByteBlocking(read[i]>>8);
+		USB_writeByteBlocking(read[i]);
+	}
+}
 
 /**
  * @brief  Main program.
@@ -259,7 +268,6 @@ int main(void)
 	RCC_GetClocksFreq(&RCC_Clocks);
 	SysTick_Config(250); //should set interrupt to go off 32000 times a second
 
-	int i;
 /*
 	for(i = 0; i<BUFFER_SIZE; i++){
 		Buffer[i] = i;
@@ -280,6 +288,9 @@ int main(void)
 	uint16_t temp_sensor_read[3];
 	while (1)
 	{
+
+		USB_writeByteBlocking('a');
+		/*
 		Gyro_ReadAngRate(temp_sensor_read);
 		USB_writeByteBlocking('G');
 		writeSensor(temp_sensor_read);
@@ -288,7 +299,7 @@ int main(void)
 		USB_writeByteBlocking('A');
 		writeSensor(temp_sensor_read);
 
-		asdsadsa
+		//asdsadsa
 
 		Compass_ReadMag(temp_sensor_read);
 		USB_writeByteBlocking('M');
@@ -298,26 +309,7 @@ int main(void)
 		while (micros()-ora < 1000000L){//should wait 1 second
 			//do nothing
 		}
-	}
-}
-
-void writeSensor(uint16_t read[3]){
-	for (i=0;i<3;i++){
-		USB_writeByteBlocking(temp_sensor_read[i]>>8);
-		USB_writeByteBlocking(temp_sensor_read[i]);
-	}
-}
-
-/**
- * @brief  Basic management of the timeout situation.
- * @param  None.
- * @retval None.
- */
-uint32_t LSM303DLHC_TIMEOUT_UserCallback(void)
-{
-	/* Block communication and all processes */
-	while (1)
-	{
+		*/
 	}
 }
 

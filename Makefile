@@ -1,5 +1,5 @@
 ROOT=$(shell pwd)
-PROJ_NAME = stm32f3
+PROJ_NAME = Navigation
 
 ###################################################
 # Set toolchain
