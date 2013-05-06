@@ -8,7 +8,7 @@
 #ifndef USB_ENDP_C_
 #define USB_ENDP_C_
 
-extern __IO uint8_t contatoreBufferUSB;
-extern uint8_t scrivimi[BUFFER_SIZE];
+volatile uint8_t contatoreBufferUSB;
+volatile uint8_t scrivimi[BUFFER_SIZE];
 
 #endif /* USB_ENDP_C_ */

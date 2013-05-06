@@ -11,8 +11,8 @@
 #include "usb_endp.h"
 #include "usb_pwr.h"
 
-__IO uint8_t contatoreBufferUSB;
-__IO uint8_t scrivimi[BUFFER_SIZE];
+//__IO uint8_t contatoreBufferUSB;
+//__IO uint8_t scrivimi[BUFFER_SIZE];
 
 void USB_flush(){
 	while(contatoreBufferUSB >= BUFFER_SIZE)
