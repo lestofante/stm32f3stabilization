@@ -54,12 +54,6 @@ __IO uint8_t scrivimi[BUFFER_SIZE];
  * @param  None
  * @retval None
  */
-
-void EP1_IN_Callback(void) {
-
-	FreeUserBuffer(ENDP1, EP_DBUF_IN);
-	READ_DONE = 1;
-}
 void EP1_IN_Callback(void) {
 
 	uint16_t addr = 0;
