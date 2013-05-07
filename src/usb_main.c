@@ -80,7 +80,7 @@ int USB_writeByte(uint8_t dato){
 
 	scrivimi[contatoreBufferUSB++] = dato; //write the byte
 
-	if (count_byte_stuffing < byteStuffing){
+	if (count_byte_stuffing < byteStuffing-1){
 		count_byte_stuffing++;
 	}else{
 		scrivimi[contatoreBufferUSB++] = stuffing_break; //write the Stuffing byte

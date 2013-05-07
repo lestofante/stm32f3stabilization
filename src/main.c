@@ -289,7 +289,14 @@ int main(void)
 	while (1)
 	{
 
-		//USB_writeByteBlocking('a');
+		USB_writeByteBlocking('1');
+		USB_writeByteBlocking('2');
+		USB_writeByteBlocking('3');
+		USB_writeByteBlocking('4');
+		USB_writeByteBlocking('5');
+		USB_writeByteBlocking('6');
+		USB_writeByteBlocking('7');
+
 
 		Gyro_ReadAngRate(temp_sensor_read);
 		USB_writeByteBlocking('G');
