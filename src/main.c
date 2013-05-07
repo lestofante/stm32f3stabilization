@@ -294,19 +294,24 @@ int main(void)
 		Gyro_ReadAngRate(temp_sensor_read);
 		USB_writeByteBlocking('G');
 		writeSensor(temp_sensor_read);
+		//USB_writeByteBlocking('-');
 
 		Compass_ReadAcc(temp_sensor_read);
 		USB_writeByteBlocking('A');
 		writeSensor(temp_sensor_read);
+		//USB_writeByteBlocking('-');
 
 		Compass_ReadMag(temp_sensor_read);
 		USB_writeByteBlocking('M');
 		writeSensor(temp_sensor_read);
+		//USB_writeByteBlocking('-');
 
+		/*
 		uint32_t ora = micros();
 		while (micros()-ora < 1000000L){//should wait 1 second
 			;//do nothing, hoping it won't get optimized out
 		}
+		*/
 	}
 }
 

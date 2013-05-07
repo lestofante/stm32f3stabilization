@@ -22,7 +22,11 @@ uint8_t b2_tempBuffer[BUFFER];
 
 uint8_t *scrivimi;
 uint8_t *elaborazione;
-uint8_t contatoreBufferUSB = 0;
+volatile uint8_t contatoreBufferUSB = 0;
+uint8_t byteStuffing = 7;
+volatile uint8_t count_byte_stuffing = 0;
+uint8_t stuffing_inizio = 'i';
+uint8_t stuffing_break = 'b';
 
 void scriviBuffer(){
 	if (READ_DONE != 0){
@@ -36,14 +40,26 @@ void scriviBuffer(){
 		tmpBuffer = scrivimi;
 		scrivimi = elaborazione;
 		elaborazione = tmpBuffer;
-		UserToPMABufferCopy(elaborazione, addr, BUFFER);
 
 		uint8_t i;
-		for(i = 0; i<BUFFER_SIZE; i++){
-			scrivimi[i] = 0;
+
+		for (i=0;i<byteStuffing+1;i++){
+			elaborazione[contatoreBufferUSB++] = stuffing_inizio; //add END OF MESSAGE
+		}
+
+		UserToPMABufferCopy(elaborazione, addr, BUFFER);
+
+		for(i = byteStuffing; i<BUFFER_SIZE; i++){
+			scrivimi[i] = stuffing_break; //EMPTY MESSAGE
 		}
 
 		contatoreBufferUSB = 0;
+		for (i=0;i<byteStuffing+1;i++){
+			scrivimi[contatoreBufferUSB++] = stuffing_inizio; //add BEGIN OF MESSAGE
+		}
+
+		count_byte_stuffing=0;
+
 		READ_DONE = 0;
 		SetEPTxValid(ENDP1);
 	}
@@ -58,10 +74,18 @@ void USB_flush(){
 int USB_writeByte(uint8_t dato){
 	scriviBuffer(); //write if we can
 
-	if (contatoreBufferUSB >= BUFFER) //check if we have free space in buffer
+	if (contatoreBufferUSB >= BUFFER-byteStuffing-1) //check if we have free space in buffer, -3 because of our "end of data" is 0xFFFFFF
 		return 0; //sorry, no space left on buffer.
 
+
 	scrivimi[contatoreBufferUSB++] = dato; //write the byte
+
+	if (count_byte_stuffing < byteStuffing){
+		count_byte_stuffing++;
+	}else{
+		scrivimi[contatoreBufferUSB++] = stuffing_break; //write the Stuffing byte
+		count_byte_stuffing=0;
+	}
 
 	return 1; //we writed 1 byte! wow
 }
