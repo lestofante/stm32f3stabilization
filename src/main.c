@@ -289,8 +289,8 @@ int main(void)
 	while (1)
 	{
 
-		USB_writeByteBlocking('a');
-		/*
+		//USB_writeByteBlocking('a');
+
 		Gyro_ReadAngRate(temp_sensor_read);
 		USB_writeByteBlocking('G');
 		writeSensor(temp_sensor_read);
@@ -299,17 +299,14 @@ int main(void)
 		USB_writeByteBlocking('A');
 		writeSensor(temp_sensor_read);
 
-		//asdsadsa
-
 		Compass_ReadMag(temp_sensor_read);
 		USB_writeByteBlocking('M');
 		writeSensor(temp_sensor_read);
 
 		uint32_t ora = micros();
 		while (micros()-ora < 1000000L){//should wait 1 second
-			//do nothing
+			;//do nothing, hoping it won't get optimized out
 		}
-		*/
 	}
 }
 

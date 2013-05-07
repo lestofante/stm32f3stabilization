@@ -8,11 +8,80 @@
 
 //#include "hw_config.h"
 #include "usb_lib.h"
-#include "usb_endp.h"
 #include "usb_pwr.h"
 
+__IO uint8_t PrevXferComplete = 1;
+__IO uint8_t READ_DONE = 1;
+
 //__IO uint8_t contatoreBufferUSB;
-//__IO uint8_t scrivimi[BUFFER_SIZE];
+
+#define BUFFER 180
+
+uint8_t b1_tempBuffer[BUFFER];
+uint8_t b2_tempBuffer[BUFFER];
+
+uint8_t *scrivimi;
+uint8_t *elaborazione;
+uint8_t contatoreBufferUSB = 0;
+
+void scriviBuffer(){
+	if (READ_DONE != 0){
+		uint16_t addr;
+		if (PrevXferComplete){
+			addr = 0x098;
+		}else{
+			addr = 0x14c;
+		}
+		uint8_t *tmpBuffer;
+		tmpBuffer = scrivimi;
+		scrivimi = elaborazione;
+		elaborazione = tmpBuffer;
+		UserToPMABufferCopy(elaborazione, addr, BUFFER);
+
+		uint8_t i;
+		for(i = 0; i<BUFFER_SIZE; i++){
+			scrivimi[i] = 0;
+		}
+
+		contatoreBufferUSB = 0;
+		READ_DONE = 0;
+		SetEPTxValid(ENDP1);
+	}
+}
+
+void USB_flush(){
+	while(READ_DONE == 0)
+		;
+	scriviBuffer();
+}
+
+int USB_writeByte(uint8_t dato){
+	scriviBuffer(); //write if we can
+
+	if (contatoreBufferUSB >= BUFFER) //check if we have free space in buffer
+		return 0; //sorry, no space left on buffer.
+
+	scrivimi[contatoreBufferUSB++] = dato; //write the byte
+
+	return 1; //we writed 1 byte! wow
+}
+
+int USB_writeByteBlocking(uint8_t dato){
+	while (USB_writeByte(dato)< 1)
+		scriviBuffer();
+	return 1;
+}
+
+/*
+void USB_update(){
+	if(PrevXferComplete){
+		UserToPMABufferCopy(Buffer, 0x098, 180);
+		updateBuffer(fast);
+	}else{
+		UserToPMABufferCopy(Buffer2, 0x14c, 180);
+		updateBuffer2(fast);
+	}
+}
 
 void USB_flush(){
 	while(contatoreBufferUSB >= BUFFER_SIZE)
@@ -34,7 +103,7 @@ int USB_writeByteBlocking(uint8_t dato){
 		USB_flush();
 	return 1;
 }
-
+*/
 
 /**
  * @brief  Configure the USB.
@@ -48,6 +117,9 @@ void USB_Config(void)
 	USB_Interrupts_Config();
 
 	USB_Init();
+
+	scrivimi = b1_tempBuffer;
+	elaborazione = b2_tempBuffer;
 
 	while (bDeviceState != CONFIGURED)
 	{}
