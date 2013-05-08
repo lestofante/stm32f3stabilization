@@ -309,7 +309,6 @@ int main(void)
 		Gyro_ReadAngRate(temp_sensor_read);
 		writeSensor('G', temp_sensor_read);
 
-
 		//USB_writeByteBlocking('-');
 
 		Compass_ReadAcc(temp_sensor_read);
@@ -320,6 +319,15 @@ int main(void)
 		writeSensor('M', temp_sensor_read);
 		//USB_writeByteBlocking('-');
 
+
+		//FAKE TEST SENSOR
+		temp_sensor_read[0] = 0;
+		temp_sensor_read[1] = 1; //is 1
+		temp_sensor_read[2] = 0;
+		temp_sensor_read[3] = 2; //is 2
+		temp_sensor_read[4] = 1;
+		temp_sensor_read[5] = 0; //is 256
+		writeSensor('T', temp_sensor_read);
 		/*
 		uint32_t ora = micros();
 		while (micros()-ora < 1000000L){//should wait 1 second
