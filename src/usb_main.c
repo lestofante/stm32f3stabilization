@@ -68,7 +68,7 @@ void USB_flush(){
 int USB_writeByte(uint8_t dato){
 	scriviBuffer(); //write if we can
 
-	if (contatoreBufferUSB >= BUFFER-byteStuffing-1) //check if we have free space in buffer, -3 because of our "end of data" is 0xFFFFFF
+	if (contatoreBufferUSB >= BUFFER-byteStuffing-1) //check if we have free space in buffer, -byteStuffing because of our "end of data"
 		return 0; //sorry, no space left on buffer.
 
 
@@ -82,6 +82,25 @@ int USB_writeByteBlocking(uint8_t dato){
 		scriviBuffer();
 	return 1;
 }
+
+int USB_writeAtomic(uint8_t* dati, uint16_t size){
+	if (contatoreBufferUSB+size >= BUFFER-byteStuffing-1) //check if we have free space in buffer, -byteStuffing because of our "end of data"
+		return 0; //sorry, no space left on buffer.
+
+	uint16_t i=0;
+	for (i=0;i<size; i++){
+		scrivimi[contatoreBufferUSB++] = dati[i]; //write the byte
+	}
+
+	return size; //we wrote 1 byte! wow
+}
+
+int USB_writeAtomicBlocking(uint8_t* dati, uint16_t size){
+	while (USB_writeAtomic(dati, size)!= size)
+		scriviBuffer();
+	return size;
+}
+
 
 /*
 void USB_update(){

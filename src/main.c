@@ -249,20 +249,28 @@ void Acc_ReadData(float* pfData)
 	}
 }
 
-void writeSensor(uint16_t read[3]){
-	uint8_t i;
+void writeSensor(uint8_t lettera, uint16_t read[3]){
+	uint8_t data[15];
+	uint8_t index =0;
 
+	//2 times
+	data[index++] = lettera;
+	data[index++] = lettera;
+
+	//now data
+	uint8_t i;
 	for (i=0;i<3;i++){
 
-		USB_writeByteBlocking(read[i]>>8);
+		data[index++] = (read[i]>>8);
 		if(read[i]>>8=='A'||read[i]>>8=='G'||read[i]>>8=='M')
-			USB_writeByteBlocking('b');
+			data[index++] = 'b';
 
-		USB_writeByteBlocking(read[i]);
+		data[index++] = read[i];
 		if(read[i]=='A'||read[i]=='G'||read[i]=='M')
-			USB_writeByteBlocking('b');
-
+			data[index++] = 'b';
 	}
+
+	USB_writeAtomicBlocking(data, index);
 }
 
 /**
@@ -296,22 +304,20 @@ int main(void)
 	uint16_t temp_sensor_read[3];
 	while (1)
 	{
+
+
 		Gyro_ReadAngRate(temp_sensor_read);
-		USB_writeByteBlocking('G');
-		USB_writeByteBlocking('G');
-		writeSensor(temp_sensor_read);
+		writeSensor('G', temp_sensor_read);
+
+
 		//USB_writeByteBlocking('-');
 
 		Compass_ReadAcc(temp_sensor_read);
-		USB_writeByteBlocking('A');
-		USB_writeByteBlocking('A');
-		writeSensor(temp_sensor_read);
+		writeSensor('A', temp_sensor_read);
 		//USB_writeByteBlocking('-');
 
 		Compass_ReadMag(temp_sensor_read);
-		USB_writeByteBlocking('M');
-		USB_writeByteBlocking('M');
-		writeSensor(temp_sensor_read);
+		writeSensor('M', temp_sensor_read);
 		//USB_writeByteBlocking('-');
 
 		/*
