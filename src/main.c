@@ -144,7 +144,7 @@ static uint8_t *USBD_HID_GetPos (void)
 
 	return HID_Buffer;
 }
-*/
+ */
 /**
  * @brief  Configure the Mems to Accelerometer MEMS.
  * @param  None
@@ -251,9 +251,17 @@ void Acc_ReadData(float* pfData)
 
 void writeSensor(uint16_t read[3]){
 	uint8_t i;
+
 	for (i=0;i<3;i++){
+
 		USB_writeByteBlocking(read[i]>>8);
+		if(read[i]>>8=='A'||read[i]>>8=='G'||read[i]>>8=='M')
+			USB_writeByteBlocking('b');
+
 		USB_writeByteBlocking(read[i]);
+		if(read[i]=='A'||read[i]=='G'||read[i]=='M')
+			USB_writeByteBlocking('b');
+
 	}
 }
 
@@ -268,17 +276,17 @@ int main(void)
 	RCC_GetClocksFreq(&RCC_Clocks);
 	SysTick_Config(250); //should set interrupt to go off 32000 times a second
 
-/*
+	/*
 	for(i = 0; i<BUFFER_SIZE; i++){
 		Buffer[i] = i;
 	}
-*/
+	 */
 	/* Configure the USB */
 	USB_Config();
-/*
+	/*
 	UserToPMABufferCopy(Buffer, 0x098, 180);
 	UserToPMABufferCopy(Buffer2, 0x14c, 180);
-*/
+	 */
 	/* Infinite loop */
 
 	Gyro_Config();
@@ -288,27 +296,20 @@ int main(void)
 	uint16_t temp_sensor_read[3];
 	while (1)
 	{
-
-		USB_writeByteBlocking('1');
-		USB_writeByteBlocking('2');
-		USB_writeByteBlocking('3');
-		USB_writeByteBlocking('4');
-		USB_writeByteBlocking('5');
-		USB_writeByteBlocking('6');
-		USB_writeByteBlocking('7');
-
-
 		Gyro_ReadAngRate(temp_sensor_read);
+		USB_writeByteBlocking('G');
 		USB_writeByteBlocking('G');
 		writeSensor(temp_sensor_read);
 		//USB_writeByteBlocking('-');
 
 		Compass_ReadAcc(temp_sensor_read);
 		USB_writeByteBlocking('A');
+		USB_writeByteBlocking('A');
 		writeSensor(temp_sensor_read);
 		//USB_writeByteBlocking('-');
 
 		Compass_ReadMag(temp_sensor_read);
+		USB_writeByteBlocking('M');
 		USB_writeByteBlocking('M');
 		writeSensor(temp_sensor_read);
 		//USB_writeByteBlocking('-');
@@ -318,7 +319,7 @@ int main(void)
 		while (micros()-ora < 1000000L){//should wait 1 second
 			;//do nothing, hoping it won't get optimized out
 		}
-		*/
+		 */
 	}
 }
 

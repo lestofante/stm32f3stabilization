@@ -26,6 +26,7 @@ volatile uint8_t contatoreBufferUSB = 0;
 uint8_t byteStuffing = 7;
 volatile uint8_t count_byte_stuffing = 0;
 uint8_t stuffing_inizio = 'i';
+uint8_t stuffing_fine = 'f';
 uint8_t stuffing_break = 'b';
 
 void scriviBuffer(){
@@ -43,10 +44,6 @@ void scriviBuffer(){
 
 		uint8_t i;
 
-		for (i=0;i<byteStuffing+1;i++){
-			elaborazione[contatoreBufferUSB++] = stuffing_inizio; //add END OF MESSAGE
-		}
-
 		UserToPMABufferCopy(elaborazione, addr, BUFFER);
 
 		for(i = byteStuffing; i<BUFFER_SIZE; i++){
@@ -54,9 +51,6 @@ void scriviBuffer(){
 		}
 
 		contatoreBufferUSB = 0;
-		for (i=0;i<byteStuffing+1;i++){
-			scrivimi[contatoreBufferUSB++] = stuffing_inizio; //add BEGIN OF MESSAGE
-		}
 
 		count_byte_stuffing=0;
 
@@ -80,14 +74,7 @@ int USB_writeByte(uint8_t dato){
 
 	scrivimi[contatoreBufferUSB++] = dato; //write the byte
 
-	if (count_byte_stuffing < byteStuffing-1){
-		count_byte_stuffing++;
-	}else{
-		scrivimi[contatoreBufferUSB++] = stuffing_break; //write the Stuffing byte
-		count_byte_stuffing=0;
-	}
-
-	return 1; //we writed 1 byte! wow
+	return 1; //we wrote 1 byte! wow
 }
 
 int USB_writeByteBlocking(uint8_t dato){
