@@ -322,11 +322,8 @@ int main(void)
 
 		//FAKE TEST SENSOR
 		temp_sensor_read[0] = 0;
-		temp_sensor_read[1] = 1; //is 1
-		temp_sensor_read[2] = 0;
-		temp_sensor_read[3] = 2; //is 2
-		temp_sensor_read[4] = 1;
-		temp_sensor_read[5] = 0; //is 256
+		temp_sensor_read[1] = 256; //Warning! THIS WILL NOT BE 256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be 1
+		temp_sensor_read[2] = -256; //Warning! THIS WILL NOT BE -256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be -1 (i think)
 		writeSensor('T', temp_sensor_read);
 		/*
 		uint32_t ora = micros();
