@@ -284,17 +284,9 @@ int main(void)
 	RCC_GetClocksFreq(&RCC_Clocks);
 	SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000000UL);
 
-	/*
-	for(i = 0; i<BUFFER_SIZE; i++){
-		Buffer[i] = i;
-	}
-	 */
 	/* Configure the USB */
 	USB_Config();
-	/*
-	UserToPMABufferCopy(Buffer, 0x098, 180);
-	UserToPMABufferCopy(Buffer2, 0x14c, 180);
-	 */
+
 	/* Infinite loop */
 
 	Gyro_Config();
