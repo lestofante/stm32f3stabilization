@@ -280,9 +280,9 @@ void writeSensor(uint8_t lettera, uint16_t read[3]){
  */
 int main(void)
 {
-	/* SysTick end of count event each 10ms */
+	/* SysTick end of count event each 1us */
 	RCC_GetClocksFreq(&RCC_Clocks);
-	SysTick_Config(250); //should set interrupt to go off 32000 times a second
+	SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000000UL);
 
 	/*
 	for(i = 0; i<BUFFER_SIZE; i++){
@@ -302,32 +302,47 @@ int main(void)
 	Compass_Config();
 
 	uint16_t temp_sensor_read[3];
+
+	uint32_t lastGyro=0, lastacc=0, lastMagne=0, lastMillisec=micros();
 	while (1)
 	{
 
+		//gyro is 760Hz, so read it every 1315 micros
+		if ( micros() - lastGyro > 1315){
+			Gyro_ReadAngRate(temp_sensor_read);
+			writeSensor('G', temp_sensor_read);
+			lastGyro = micros();
+		}
 
-		Gyro_ReadAngRate(temp_sensor_read);
-		writeSensor('G', temp_sensor_read);
+		//acc is 400Hz, so read it every 2500 micros
+		if ( micros() - lastacc > 2500){
+			Compass_ReadAcc(temp_sensor_read);
+			writeSensor('A', temp_sensor_read);
+			lastacc = micros();
+		}
 
-		//USB_writeByteBlocking('-');
-
-		Compass_ReadAcc(temp_sensor_read);
-		writeSensor('A', temp_sensor_read);
-		//USB_writeByteBlocking('-');
-
-		Compass_ReadMag(temp_sensor_read);
-		writeSensor('M', temp_sensor_read);
-		//USB_writeByteBlocking('-');
+		//mag is 220Hz, so read it every 4545 micros
+		if ( micros() - lastMagne > 4545){
+			Compass_ReadMag(temp_sensor_read);
+			writeSensor('M', temp_sensor_read);
+			lastMagne = micros();
+		}
 
 
 		//FAKE TEST SENSOR
-		temp_sensor_read[0] = 0;
-		temp_sensor_read[1] = 256; //Warning! THIS WILL NOT BE 256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be 1
+		temp_sensor_read[0] = 0;//THIS NUMBER IS MY "version" NUMBER, to check if upload is successful :)
+		temp_sensor_read[1] = micros(); //Warning! THIS WILL NOT BE 256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be 1
 		temp_sensor_read[2] = -256; //Warning! THIS WILL NOT BE -256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be -1 (i think)
 		writeSensor('T', temp_sensor_read);
+
+		if (micros() - lastMillisec >= 1000){
+			writeSensor('S', temp_sensor_read);
+			//lastMillisec += 1000; //try to recuperate lost time :)
+			lastMillisec = micros();
+		}
 		/*
 		uint32_t ora = micros();
-		while (micros()-ora < 1000000L){//should wait 1 second
+		while (micros()-ora < 1000000UL){//should wait 1 second
 			;//do nothing, hoping it won't get optimized out
 		}
 		 */

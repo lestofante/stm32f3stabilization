@@ -9,7 +9,7 @@
 #include "common.h"
 
 
-__IO uint32_t uSec = 0;
+volatile uint32_t uSec = 0;
 
 
 /**
