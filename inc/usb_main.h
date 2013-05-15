@@ -16,6 +16,7 @@
  int USB_writeByte(uint8_t dato);
  int USB_writeByteBlocking(uint8_t dato);
  void USB_Config(void);
+ int USB_writeAtomicBlocking(uint8_t*, uint16_t);
 
 #ifdef __cplusplus
  }

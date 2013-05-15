@@ -283,6 +283,7 @@ int main(void)
 	/* SysTick end of count event each 1us */
 	RCC_GetClocksFreq(&RCC_Clocks);
 	SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000000UL);
+	//SysTick_Config(250); //should set interrupt to go off 32000 times a second
 
 	/* Configure the USB */
 	USB_Config();
@@ -300,24 +301,24 @@ int main(void)
 	{
 
 		//gyro is 760Hz, so read it every 1315 micros
-		if ( micros() - lastGyro > 1315){
+		if ( micros() - lastGyro > 2500){
 			Gyro_ReadAngRate(temp_sensor_read);
-			writeSensor('G', temp_sensor_read);
 			lastGyro = micros();
+			writeSensor('G', temp_sensor_read);
 		}
 
 		//acc is 400Hz, so read it every 2500 micros
 		if ( micros() - lastacc > 2500){
 			Compass_ReadAcc(temp_sensor_read);
-			writeSensor('A', temp_sensor_read);
 			lastacc = micros();
+			writeSensor('A', temp_sensor_read);
 		}
 
 		//mag is 220Hz, so read it every 4545 micros
 		if ( micros() - lastMagne > 4545){
 			Compass_ReadMag(temp_sensor_read);
-			writeSensor('M', temp_sensor_read);
 			lastMagne = micros();
+			writeSensor('M', temp_sensor_read);
 		}
 
 

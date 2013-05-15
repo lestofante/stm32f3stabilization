@@ -112,7 +112,7 @@ void Compass_Config(void)
 	LSM303DLHC_InitStructure.MagFull_Scale = LSM303DLHC_FS_1_3_GA;
 	magnetometerZtoXY = LSM303DLHC_M_SENSITIVITY_Z_1_3Ga / LSM303DLHC_M_SENSITIVITY_XY_1_3Ga;//because z has different sensitivity
 
-	LSM303DLHC_InitStructure.Working_Mode = LSM303DLHC_SINGLE_CONVERSION;
+	LSM303DLHC_InitStructure.Working_Mode = LSM303DLHC_CONTINUOS_CONVERSION;
 	LSM303DLHC_MagInit(&LSM303DLHC_InitStructure);
 
 	/* Fill the accelerometer structure */
