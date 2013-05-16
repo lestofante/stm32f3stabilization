@@ -10,9 +10,9 @@
 
 
 extern void Gyro_Config(void);
-extern void Gyro_ReadAngRate (uint16_t* pfData);
+extern uint8_t Gyro_ReadAngRate (uint16_t* pfData);
 extern void Compass_Config(void);
-extern void Compass_ReadAcc(uint16_t* pfData);
-extern void Compass_ReadMag (uint16_t* pfData);
+extern uint8_t Compass_ReadAcc(uint16_t* pfData);
+extern uint8_t Compass_ReadMag (uint16_t* pfData);
 
 #endif /* SENSORS_H_ */

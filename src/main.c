@@ -296,42 +296,43 @@ int main(void)
 
 	uint16_t temp_sensor_read[3];
 
-	uint32_t lastGyro=0, lastacc=0, lastMagne=0, lastMillisec=micros();
+	uint32_t lastGyro=0, lastacc=0, lastMagne=0, lastMicrosec=micros();
 	while (1)
 	{
 
-		//gyro is 760Hz, so read it every 1315 micros
-		if ( micros() - lastGyro > 2500){
-			Gyro_ReadAngRate(temp_sensor_read);
-			lastGyro = micros();
+		//if gyro update is ready
+		if ( Gyro_ReadAngRate(temp_sensor_read)!= 0 ){
 			writeSensor('G', temp_sensor_read);
+		}else{
+			temp_sensor_read[0] = 0;//THIS NUMBER IS MY "version" NUMBER, to check if upload is successful :)
+			temp_sensor_read[1] = micros(); //Warning! THIS WILL NOT BE 256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be 1
+			temp_sensor_read[2] = -256; //Warning! THIS WILL NOT BE -256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be -1 (i think)
+			writeSensor('T', temp_sensor_read);
 		}
 
-		//acc is 400Hz, so read it every 2500 micros
-		if ( micros() - lastacc > 2500){
-			Compass_ReadAcc(temp_sensor_read);
-			lastacc = micros();
+		//if acc update is ready
+		if ( Compass_ReadAcc(temp_sensor_read)!= 0 ){
 			writeSensor('A', temp_sensor_read);
 		}
 
 		//mag is 220Hz, so read it every 4545 micros
-		if ( micros() - lastMagne > 4545){
-			Compass_ReadMag(temp_sensor_read);
-			lastMagne = micros();
+		if ( Compass_ReadMag(temp_sensor_read)!= 0 ){
 			writeSensor('M', temp_sensor_read);
 		}
 
 
+
 		//FAKE TEST SENSOR
+		/*
 		temp_sensor_read[0] = 0;//THIS NUMBER IS MY "version" NUMBER, to check if upload is successful :)
 		temp_sensor_read[1] = micros(); //Warning! THIS WILL NOT BE 256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be 1
 		temp_sensor_read[2] = -256; //Warning! THIS WILL NOT BE -256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be -1 (i think)
 		writeSensor('T', temp_sensor_read);
-
-		if (micros() - lastMillisec >= 1000){
+		*/
+		if (micros() - lastMicrosec >= 1000000UL){
 			writeSensor('S', temp_sensor_read);
 			//lastMillisec += 1000; //try to recuperate lost time :)
-			lastMillisec = micros();
+			lastMicrosec = micros();
 		}
 		/*
 		uint32_t ora = micros();
