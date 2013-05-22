@@ -61,7 +61,7 @@ void Gyro_Config(void)
 	L3GD20_Init(&L3GD20_InitStructure);
 
 	L3GD20_FilterStructure.HighPassFilter_Mode_Selection =L3GD20_HPM_NORMAL_MODE_RES;
-	L3GD20_FilterStructure.HighPassFilter_CutOff_Frequency = L3GD20_HPFCF_0; //51.4Hz
+	L3GD20_FilterStructure.HighPassFilter_CutOff_Frequency = L3GD20_HPFCF_9; //51.4Hz
 	L3GD20_FilterConfig(&L3GD20_FilterStructure) ;
 
 	L3GD20_FilterCmd(L3GD20_HIGHPASSFILTER_ENABLE);
@@ -81,7 +81,7 @@ uint8_t Gyro_ReadAngRate (uint16_t* pfData)
 
 	L3GD20_Read(&tmpreg,L3GD20_STATUS_REG_ADDR,1);
 
-	if (!(tmpreg & 0x08)){ //no data ready!
+	if ( (tmpreg & 0x08) == 0 ){ //no data ready!
 		return 0;
 	}
 
@@ -92,7 +92,7 @@ uint8_t Gyro_ReadAngRate (uint16_t* pfData)
 
 	for(i=0; i<3; i++)
 	{
-		pfData[i]=(int16_t)(((uint16_t)buffer[2*i+1] << 8) + buffer[2*i]);
+		pfData[i]=(int16_t)(((uint16_t)buffer[2*i] << 8) + buffer[2*i+1]);
 	}
 
 	return 1;
@@ -113,10 +113,12 @@ void Compass_Config(void)
 
 	LSM303DLHC_InitStructure.Temperature_Sensor = LSM303DLHC_TEMPSENSOR_DISABLE;
 	LSM303DLHC_InitStructure.MagOutput_DataRate =LSM303DLHC_ODR_220_HZ;
-	LSM303DLHC_InitStructure.MagFull_Scale = LSM303DLHC_FS_1_3_GA;
+	//LSM303DLHC_InitStructure.MagFull_Scale = LSM303DLHC_FS_1_3_GA;
+	LSM303DLHC_InitStructure.MagFull_Scale = LSM303DLHC_FS_8_1_GA;
+
 	magnetometerZtoXY = LSM303DLHC_M_SENSITIVITY_Z_1_3Ga / LSM303DLHC_M_SENSITIVITY_XY_1_3Ga;//because z has different sensitivity
 
-	LSM303DLHC_InitStructure.Working_Mode = LSM303DLHC_CONTINUOS_CONVERSION;
+	LSM303DLHC_InitStructure.Working_Mode = LSM303DLHC_SINGLE_CONVERSION;
 	LSM303DLHC_MagInit(&LSM303DLHC_InitStructure);
 
 	/* Fill the accelerometer structure */
@@ -168,7 +170,7 @@ uint8_t Compass_ReadAcc(uint16_t* pfData)
 
 	LSM303DLHC_Read(ACC_I2C_ADDRESS, LSM303DLHC_STATUS_REG_A, &tmpreg, 1);
 
-	if (!(tmpreg & 0x08)){ //no data ready!
+	if ( (tmpreg & 0x08) == 0 ){ //no data ready!
 		return 0;
 	}
 
@@ -195,7 +197,7 @@ uint8_t Compass_ReadMag (uint16_t* pfData)
 
 	LSM303DLHC_Read(MAG_I2C_ADDRESS, LSM303DLHC_SR_REG_M, &tmpreg, 1);
 
-	if (!(tmpreg & 0x01)){ //no data ready!
+	if ((tmpreg & 0x02) == 0){ //no data ready!
 		return 0;
 	}
 
@@ -215,7 +217,7 @@ uint8_t Compass_ReadMag (uint16_t* pfData)
 	{
 		pfData[i]=((int16_t)((uint16_t)buffer[2*i] << 8) + buffer[2*i+1]);
 	}
-	pfData[1]*= magnetometerZtoXY; //because Z has different sensitivity
+	//pfData[1]*= magnetometerZtoXY; //because Z has different sensitivity
 
 	return 1;
 }

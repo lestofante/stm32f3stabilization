@@ -282,7 +282,7 @@ int main(void)
 {
 	/* SysTick end of count event each 1us */
 	RCC_GetClocksFreq(&RCC_Clocks);
-	SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000000UL);
+	SysTick_Config( (RCC_Clocks.HCLK_Frequency / 1000000UL) );
 	//SysTick_Config(250); //should set interrupt to go off 32000 times a second
 
 	/* Configure the USB */
@@ -303,13 +303,16 @@ int main(void)
 		//if gyro update is ready
 		if ( Gyro_ReadAngRate(temp_sensor_read)!= 0 ){
 			writeSensor('G', temp_sensor_read);
-		}else{
+		}
+		/*
+		else{
 			temp_sensor_read[0] = 0;//THIS NUMBER IS MY "version" NUMBER, to check if upload is successful :)
 			temp_sensor_read[1] = micros(); //Warning! THIS WILL NOT BE 256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be 1
 			temp_sensor_read[2] = -256; //Warning! THIS WILL NOT BE -256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be -1 (i think)
 			writeSensor('T', temp_sensor_read);
 		}
-
+		*/
+/*
 		//if acc update is ready
 		if ( Compass_ReadAcc(temp_sensor_read)!= 0 ){
 			writeSensor('A', temp_sensor_read);
@@ -319,7 +322,7 @@ int main(void)
 		if ( Compass_ReadMag(temp_sensor_read)!= 0 ){
 			writeSensor('M', temp_sensor_read);
 		}
-
+*/
 
 
 		//FAKE TEST SENSOR
@@ -329,11 +332,17 @@ int main(void)
 		temp_sensor_read[2] = -256; //Warning! THIS WILL NOT BE -256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be -1 (i think)
 		writeSensor('T', temp_sensor_read);
 		*/
-		if (micros() - lastMicrosec >= 1000000UL){
+		/*
+		if (micros() - lastMicrosec >= 1000UL){
+			temp_sensor_read[0] = 0;//THIS NUMBER IS MY "version" NUMBER, to check if upload is successful :)
+			temp_sensor_read[1] = micros(); //Warning! THIS WILL NOT BE 256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be 1
+			temp_sensor_read[2] = -256; //Warning! THIS WILL NOT BE -256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be -1 (i think)
+
 			writeSensor('S', temp_sensor_read);
 			//lastMillisec += 1000; //try to recuperate lost time :)
 			lastMicrosec = micros();
 		}
+		*/
 		/*
 		uint32_t ora = micros();
 		while (micros()-ora < 1000000UL){//should wait 1 second
