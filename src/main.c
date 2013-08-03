@@ -294,15 +294,33 @@ int main(void)
 
 	Compass_Config();
 
-	uint16_t temp_sensor_read[3];
+	uint16_t temp_sensor_read[] = {0, 0, 0};
 
 	uint32_t lastGyro=0, lastacc=0, lastMagne=0, lastMicrosec=micros();
+	uint16_t read = 0, cicle = 0;
+	uint32_t ora = micros();
 	while (1)
 	{
+		cicle++;
+		//writeSensor('G', temp_sensor_read);
+
+		if (micros() - ora >= 1000000UL){
+			temp_sensor_read[0] = (micros - ora)>>16;
+			writeSensor('S', temp_sensor_read);
+			ora = micros();
+		}
 
 		//if gyro update is ready
 		if ( Gyro_ReadAngRate(temp_sensor_read)!= 0 ){
+			if (temp_sensor_read[0] > 200 && temp_sensor_read[0] < 65.336 ){
+				temp_sensor_read[0]++;
+			}
 			writeSensor('G', temp_sensor_read);
+			read++;
+			temp_sensor_read[0] = cicle;
+			temp_sensor_read[1] = read;
+			temp_sensor_read[2] = micros();
+			writeSensor('T', temp_sensor_read);
 		}
 		/*
 		else{
@@ -344,11 +362,11 @@ int main(void)
 		}
 		*/
 		/*
-		uint32_t ora = micros();
+
 		while (micros()-ora < 1000000UL){//should wait 1 second
 			;//do nothing, hoping it won't get optimized out
 		}
-		 */
+		*/
 	}
 }
 
