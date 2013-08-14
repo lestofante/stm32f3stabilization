@@ -46,7 +46,7 @@
 #define RIGHT           3
 #define UP              4
 
-#define BUFFER_SIZE 180
+#define BUFFER_SIZE 64
 
 
 /* Exported functions ------------------------------------------------------- */

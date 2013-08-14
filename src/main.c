@@ -302,25 +302,27 @@ int main(void)
 	while (1)
 	{
 		cicle++;
+
+
 		//writeSensor('G', temp_sensor_read);
 
-		if (micros() - ora >= 1000000UL){
-			temp_sensor_read[0] = (micros - ora)>>16;
+		//if (micros() - ora >= 1000000UL){
+			temp_sensor_read[0] = (micros() - ora)>>16;
 			writeSensor('S', temp_sensor_read);
 			ora = micros();
-		}
+		//}
 
 		//if gyro update is ready
 		if ( Gyro_ReadAngRate(temp_sensor_read)!= 0 ){
 			if (temp_sensor_read[0] > 200 && temp_sensor_read[0] < 65.336 ){
 				temp_sensor_read[0]++;
 			}
-			writeSensor('G', temp_sensor_read);
+			//writeSensor('G', temp_sensor_read);
 			read++;
 			temp_sensor_read[0] = cicle;
 			temp_sensor_read[1] = read;
 			temp_sensor_read[2] = micros();
-			writeSensor('T', temp_sensor_read);
+			//writeSensor('T', temp_sensor_read);
 		}
 		/*
 		else{

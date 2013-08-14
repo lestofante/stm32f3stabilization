@@ -162,7 +162,7 @@ void Joystick_Reset(void)
 
   /* Initialize Endpoint 0 */
   SetEPType(ENDP0, EP_CONTROL);
-  SetEPTxStatus(ENDP0, EP_TX_STALL);
+  SetEPTxStatus(ENDP0, EP_TX_NAK);
   SetEPRxAddr(ENDP0, ENDP0_RXADDR);
   SetEPTxAddr(ENDP0, ENDP0_TXADDR);
   Clear_Status_Out(ENDP0);
@@ -177,14 +177,18 @@ void Joystick_Reset(void)
   SetEPRxStatus(ENDP1, EP_RX_DIS);
   SetEPTxStatus(ENDP1, EP_TX_VALID);*/
 
-  SetEPType(ENDP1, EP_ISOCHRONOUS);
-  SetEPDblBuffAddr(ENDP1, ENDP1_BUF0, ENDP1_BUF1);
-  SetEPDblBuffCount(ENDP1, EP_DBUF_IN, 180);
-  ClearDTOG_RX(ENDP1);
-  ClearDTOG_TX(ENDP1);
-  ToggleDTOG_RX(ENDP1);
-  SetEPRxStatus(ENDP1, EP_TX_VALID);
-  SetEPTxStatus(ENDP1, EP_RX_DIS);
+  /* Initialize Endpoint 1 */
+   SetEPType(ENDP1, EP_BULK);
+   SetEPDoubleBuff(ENDP1);
+   SetEPDblBuffAddr(ENDP1, ENDP1_BUF0, ENDP1_BUF1);
+   SetEPDblBuffCount(ENDP1, EP_DBUF_IN, 64);
+   ClearDTOG_RX(ENDP1);
+   ClearDTOG_TX(ENDP1);
+   ToggleDTOG_RX(ENDP1);
+   SetEPRxStatus(ENDP1, EP_TX_DIS);
+   SetEPTxStatus(ENDP1, EP_TX_NAK);
+
+   SetEPRxValid(ENDP0);
 
   /* Set this device to response on default address */
   SetDeviceAddress(0);

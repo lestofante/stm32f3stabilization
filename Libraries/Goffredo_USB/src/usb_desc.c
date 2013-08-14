@@ -84,10 +84,9 @@ const uint8_t Joystick_ConfigDescriptor[MIC_SIZ_CONFIG_DESC] =
   {
     0x09, /* bLength: Configuration Descriptor size */
     USB_CONFIGURATION_DESCRIPTOR_TYPE, /* bDescriptorType: Configuration */
-    MIC_SIZ_CONFIG_DESC,
-    /* wTotalLength: Bytes returned */
+    27,    /* wTotalLength: Bytes returned */
     0x00,
-    0x02,         /*bNumInterfaces: 2 interfaces*/
+    0x01,         /*bNumInterfaces: 1 interfaces*/
     0x01,         /*bConfigurationValue: Configuration value*/
     0x00,         /*iConfiguration: Index of string descriptor describing
                                      the configuration*/
@@ -100,121 +99,22 @@ const uint8_t Joystick_ConfigDescriptor[MIC_SIZ_CONFIG_DESC] =
     USB_INTERFACE_DESCRIPTOR_TYPE,/*bDescriptorType: Interface descriptor type*/
     0x00,         /*bInterfaceNumber: Number of Interface*/
     0x00,         /*bAlternateSetting: Alternate setting*/
-    0x00,         /*bNumEndpoints*/
-    0x01,         /*bInterfaceClass: Audio*/
-    0x01,         /*bInterfaceSubClass : Audio Control*/
+    0x01,         /*bNumEndpoints*/
+    0xff,         /*bInterfaceClass: custom*/
+    0xff,         /*bInterfaceSubClass : custom Control*/
     0x00,         /*nInterfaceProtocol : Unused*/
-    0,            /*iInterface: Index of string descriptor*/
-    /******************** Class specific descriptor: AC interface ********************/
-    /* 18 */
-    0x09,         /*bLength: Descriptor size*/
-    CLASS_SPECIFIC_DESCRIPTOR_TYPE, /*bDescriptorType: Class specific*/
-    0x01,         /*bHEADER subtype*/
-    0x01,
-    0x00,         /*bCountryCode: Hardware target country*/
-    0x1E,
-    0x00,         /*bTotal size of class specific descriptors*/
-    0x01,		  /*number of streaming interfaces*/
-    0x01,			/*AudioStreaming interface 1 belongs to this AudioControl interface.*/
-    /******************** Input Terminal Descriptor ********************/
-    /* 27 */
-    0x0C,          /*bLength: Descriptor size*/
-    CLASS_SPECIFIC_DESCRIPTOR_TYPE, /*bDescriptorType:*/
-
-    0x02,          /*Input terminal subtype*/
-    0x01,          /*ID*/
-    0x01,
-    0x02,			/*Microphone type*/
-    0x00,          /*no association*/
-    0x01,			/*one channel*/
-    0x00,
-    0x00,			/*mono sets no position bits*/
-    0x00,			/*unused*/
-    0x00,			/*unused*/
-    /*39*/
-
-    /************************ Output Terminal Descriptor ****************************/
-    0x09,
-    0x24,
-    0x03,
-    0x02,
-    0x01,
-    0x01,
-    0x00,
-    0x01,
-    0x00,
-    /*48*/
-
-    /******** Standard Audio Streaming Interface Descriptor*******/
-    /*Alternate setting 0*/
-    0x09,
-    0x04,
-    0x01,
-    0x00,
-    0x00,
-    0x01,
-    0x02,
-    0x00,
-    0x00,
-    /*57*/
-
-    /*Alternate setting 1*/
-    0x09,
-    0x04,
-    0x01,
-    0x01,
-    0x01,
-    0x01,
-    0x02,
-    0x00,
-    0x00,
-    /*66*/
-
-    /*Class specific interface for AudioStreaming*/
-    0x07,
-    CLASS_SPECIFIC_DESCRIPTOR_TYPE,
-    0x01,
-    0x02,
-    0x01,
-    0x00,
-    0x01,
-    /*73*/
-
-    /*Type I format type descriptorS*/
-    0x0B,
-    CLASS_SPECIFIC_DESCRIPTOR_TYPE,
-    0x02,
-    0x01,
-    0x01,
-    0x02,   /* two bytes per audio sub frame*/
-    0x10,   /* sample resolution */
-    0x01,
-    (uint8_t)(LO_SR),
-    (uint8_t)(MED_SR),
-    HI_SR,	//sampling rate
-    /*84*/
+    0,
 
     /*standard endpoint descriptor*/
     0x09,
     0x05,
     0x81,
-    0x01,
-    0xb4, /*maxPacketSize*/
+    0x02,
+    64, /*maxPacketSize*/
     0x00,
     0x01,
     0x00,
     0x00,
-    /*93*/
-
-    /*Class specific isochronous audio data endpoint descriptor*/
-    0x07,
-    0x25,
-    0x01,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    /* 100 */
   }
   ; /* MOUSE_ConfigDescriptor */
 const uint8_t Joystick_ReportDescriptor[JOYSTICK_SIZ_REPORT_DESC] =

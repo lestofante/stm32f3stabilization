@@ -28,7 +28,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
 #include "usb_istr.h"
+#include "usb_main.h"
 
+
+#define BUFFER 180
+
+
+uint8_t vuoto[BUFFER] = {0};
 /** @addtogroup STM32F3_Discovery_Peripheral_Examples
   * @{
   */
@@ -41,34 +47,35 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-extern __IO uint8_t PrevXferComplete;
-extern __IO uint8_t READ_DONE;
+extern __IO bool NEXT_BUFFER_R;
+extern __IO bool* DATA_PRESENT;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
 /**
-  * @brief  EP1 OUT Callback Routine.
+  * @brief  EP1 IN Callback Routine.
   * @param  None
   * @retval None
   */
 void EP1_IN_Callback(void)
 {
+	if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
+	{
+		DATA_PRESENT[1] = 0;
+		NEXT_BUFFER_R = 0;
+	}
+	else
+	{
+		DATA_PRESENT[0] = 0;
+		NEXT_BUFFER_R = 1;
+	}
 
-	  if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
-	  {
-		  PrevXferComplete=0;
-	  }
-	  else
-	  {
-		  PrevXferComplete=1;
-	  }
-
-	  FreeUserBuffer(ENDP1, EP_DBUF_IN);
-	  READ_DONE = 1;
+	if(!DATA_PRESENT[NEXT_BUFFER_R]){
+		SetEPTxCount(ENDP1,0);
+		SetEPTxValid(ENDP1);
+	}
 }
-
-
 /**
   * @}
   */

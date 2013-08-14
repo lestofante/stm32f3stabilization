@@ -57,7 +57,7 @@
 /* tx buffer base address */
 #define ENDP1_TXADDR        (0x098)
 #define ENDP1_BUF0			(0x098)
-#define ENDP1_BUF1			(0x14c)
+#define ENDP1_BUF1			(0x0D8)
 
 /*-------------------------------------------------------------*/
 /* -------------------   ISTR events  -------------------------*/
