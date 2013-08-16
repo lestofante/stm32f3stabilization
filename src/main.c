@@ -270,7 +270,7 @@ void writeSensor(uint8_t lettera, uint16_t read[3]){
 			data[index++] = 'b';
 	}
 
-	USB_writeAtomicBlocking(data, index);
+	USB_write(data,index);
 }
 
 /**
@@ -309,6 +309,10 @@ int main(void)
 		//if (micros() - ora >= 1000000UL){
 			temp_sensor_read[0] = (micros() - ora)>>16;
 			writeSensor('S', temp_sensor_read);
+			if(cicle==1){
+				SetEPTxCount(ENDP1,8);
+				SetEPTxValid(ENDP1);
+			}
 			ora = micros();
 		//}
 
