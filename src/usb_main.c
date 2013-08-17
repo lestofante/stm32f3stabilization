@@ -13,12 +13,17 @@ __IO uint8_t NEXT_BUFFER_W = 0;
 __IO uint8_t NEXT_BUFFER_R = 0;
 __IO uint8_t DATA_PRESENT[2];
 __IO uint8_t DATA[2];
+bool started = FALSE;
+
+uint8_t seqN = 0;
 
 void USB_write(uint8_t* toWrite, uint16_t size){
+
 	if(size>63) size = 63;
 	if(size<0) size = 0;
 
 	while(DATA_PRESENT[NEXT_BUFFER_W]);
+
 	uint16_t addr;
 
 	if(!NEXT_BUFFER_W){
@@ -27,11 +32,18 @@ void USB_write(uint8_t* toWrite, uint16_t size){
 		addr = ENDP1_BUF1;
 	}
 
-	toWrite[0] = addr>>8;
-	toWrite[1] = addr;
-
 	UserToPMABufferCopy(toWrite, addr, size);
-	DATA[NEXT_BUFFER_W] = size;
+
+	UserToPMABufferCopy(&seqN, addr+size, 1);
+	seqN++;
+
+	DATA[NEXT_BUFFER_W] = size+1;
+
+	if(!started){
+		SetEPDblBuffCount(ENDP1,EP_DBUF_IN,DATA[NEXT_BUFFER_R]);
+		SetEPTxValid(ENDP1);
+		started = TRUE;
+	}
 
 	DATA_PRESENT[NEXT_BUFFER_W] = 1;
 	NEXT_BUFFER_W = !NEXT_BUFFER_W;

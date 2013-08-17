@@ -45,6 +45,9 @@
 extern __IO uint8_t NEXT_BUFFER_R;
 extern __IO uint8_t DATA_PRESENT[];
 extern __IO uint8_t DATA[];
+
+uint32_t count = 0;
+
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -55,7 +58,6 @@ extern __IO uint8_t DATA[];
  */
 void EP1_IN_Callback(void)
 {
-	uint16_t ep_reg = GetENDPOINT(ENDP1);
 
 	if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
 	{
@@ -68,13 +70,14 @@ void EP1_IN_Callback(void)
 		NEXT_BUFFER_R = 0;
 	}
 
-	FreeUserBuffer(ENDP1, EP_DBUF_IN);
 
 	if(DATA_PRESENT[NEXT_BUFFER_R]){
-		SetEPTxCount(ENDP1,DATA[NEXT_BUFFER_R]);
+		FreeUserBuffer(ENDP1, EP_DBUF_IN);
+		SetEPDblBuffCount(ENDP1, EP_DBUF_IN, DATA[NEXT_BUFFER_R]);
 		SetEPTxValid(ENDP1);
 	}
 
+	count++;
 }
 /**
  * @}
