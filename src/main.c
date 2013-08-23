@@ -293,61 +293,27 @@ int main(void)
 	uint32_t lastGyro=0, lastacc=0, lastMagne=0, lastMicrosec=micros();
 	uint16_t read = 0, cicle = 0;
 	uint32_t ora = micros();
+/*
+	uint16_t toWrite[3];
+	toWrite[0] = 0;
+	toWrite[1] = 0;
+	toWrite[2] = 0;
+	toWrite[0] = GetENDPOINT(ENDP1);
+	uint8_t *ptr;
+	ptr = (uint8_t*)&toWrite;
+
+	UserToPMABufferCopy(ptr, ENDP1_BUF0, 6);
+	SetEPDblBuffCount(ENDP1, EP_DBUF_IN, 6);
+*/
+	SetEPTxValid(ENDP1);
+	DATA_PRESENT[0] = 1;
 
 	while (1)
 	{
 		cicle++;
-
-		//if gyro update is ready
-		if ( (cicle%1000)==0 ){
-			temp_sensor_read[0] = cicle;
-			writeSensor('T', temp_sensor_read);
+		if(cicle%1000==0){
+			USB_write((uint8_t*)&cicle, 2);
 		}
-		/*
-		else{
-			temp_sensor_read[0] = 0;//THIS NUMBER IS MY "version" NUMBER, to check if upload is successful :)
-			temp_sensor_read[1] = micros(); //Warning! THIS WILL NOT BE 256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be 1
-			temp_sensor_read[2] = -256; //Warning! THIS WILL NOT BE -256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be -1 (i think)
-			writeSensor('T', temp_sensor_read);
-		}
-		*/
-/*
-		//if acc update is ready
-		if ( Compass_ReadAcc(temp_sensor_read)!= 0 ){
-			writeSensor('A', temp_sensor_read);
-		}
-
-		//mag is 220Hz, so read it every 4545 micros
-		if ( Compass_ReadMag(temp_sensor_read)!= 0 ){
-			writeSensor('M', temp_sensor_read);
-		}
-*/
-
-
-		//FAKE TEST SENSOR
-		/*
-		temp_sensor_read[0] = 0;//THIS NUMBER IS MY "version" NUMBER, to check if upload is successful :)
-		temp_sensor_read[1] = micros(); //Warning! THIS WILL NOT BE 256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be 1
-		temp_sensor_read[2] = -256; //Warning! THIS WILL NOT BE -256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be -1 (i think)
-		writeSensor('T', temp_sensor_read);
-		*/
-		/*
-		if (micros() - lastMicrosec >= 1000UL){
-			temp_sensor_read[0] = 0;//THIS NUMBER IS MY "version" NUMBER, to check if upload is successful :)
-			temp_sensor_read[1] = micros(); //Warning! THIS WILL NOT BE 256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be 1
-			temp_sensor_read[2] = -256; //Warning! THIS WILL NOT BE -256 BECAUSE SENSOR USE DIFFERENT ENDIANESS!!! it will be -1 (i think)
-
-			writeSensor('S', temp_sensor_read);
-			//lastMillisec += 1000; //try to recuperate lost time :)
-			lastMicrosec = micros();
-		}
-		*/
-		/*
-
-		while (micros()-ora < 1000000UL){//should wait 1 second
-			;//do nothing, hoping it won't get optimized out
-		}
-		*/
 	}
 }
 

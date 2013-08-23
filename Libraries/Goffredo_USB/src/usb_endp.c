@@ -58,6 +58,7 @@ uint32_t count = 0;
  */
 void EP1_IN_Callback(void)
 {
+	SetEPTxStatus(ENDP1, EP_TX_NAK);
 
 	if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
 	{
@@ -70,14 +71,10 @@ void EP1_IN_Callback(void)
 		NEXT_BUFFER_R = 0;
 	}
 
-
 	if(DATA_PRESENT[NEXT_BUFFER_R]){
-		FreeUserBuffer(ENDP1, EP_DBUF_IN);
 		SetEPDblBuffCount(ENDP1, EP_DBUF_IN, DATA[NEXT_BUFFER_R]);
 		SetEPTxValid(ENDP1);
 	}
-
-	count++;
 }
 /**
  * @}

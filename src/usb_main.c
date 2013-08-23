@@ -9,13 +9,12 @@
 #include "usb_lib.h"
 #include "usb_pwr.h"
 
-__IO uint8_t NEXT_BUFFER_W = 0;
+__IO uint8_t NEXT_BUFFER_W = 1;
 __IO uint8_t NEXT_BUFFER_R = 0;
 __IO uint8_t DATA_PRESENT[2];
 __IO uint8_t DATA[2];
-bool started = FALSE;
 
-uint8_t seqN = 0;
+uint8_t seqN = 1;
 
 void USB_write(uint8_t* toWrite, uint16_t size){
 
@@ -39,14 +38,10 @@ void USB_write(uint8_t* toWrite, uint16_t size){
 
 	DATA[NEXT_BUFFER_W] = size+1;
 
-	if(!started){
-		SetEPDblBuffCount(ENDP1,EP_DBUF_IN,DATA[NEXT_BUFFER_R]);
-		SetEPTxValid(ENDP1);
-		started = TRUE;
-	}
-
 	DATA_PRESENT[NEXT_BUFFER_W] = 1;
 	NEXT_BUFFER_W = !NEXT_BUFFER_W;
+
+
 
 }
 
