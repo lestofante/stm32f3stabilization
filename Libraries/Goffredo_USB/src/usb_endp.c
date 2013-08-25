@@ -42,9 +42,7 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-extern __IO uint8_t NEXT_BUFFER_R;
-extern __IO uint8_t DATA_PRESENT[];
-extern __IO uint8_t DATA[];
+extern __IO uint8_t READY;
 
 uint32_t count = 0;
 
@@ -58,23 +56,7 @@ uint32_t count = 0;
  */
 void EP1_IN_Callback(void)
 {
-	SetEPTxStatus(ENDP1, EP_TX_NAK);
-
-	if (GetENDPOINT(ENDP1) & EP_DTOG_RX)
-	{
-		DATA_PRESENT[0] = 0;
-		NEXT_BUFFER_R = 1;
-	}
-	else
-	{
-		DATA_PRESENT[1] = 0;
-		NEXT_BUFFER_R = 0;
-	}
-
-	if(DATA_PRESENT[NEXT_BUFFER_R]){
-		SetEPDblBuffCount(ENDP1, EP_DBUF_IN, DATA[NEXT_BUFFER_R]);
-		SetEPTxValid(ENDP1);
-	}
+	READY = 1;
 }
 /**
  * @}

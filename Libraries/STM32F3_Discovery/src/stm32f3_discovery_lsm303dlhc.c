@@ -629,7 +629,9 @@ static void LSM303DLHC_LowLevel_Init(void)
   I2C_InitStructure.I2C_OwnAddress1 = 0x00;
   I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
   I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
-  I2C_InitStructure.I2C_Timing = 0x00902025;
+  //I2C_InitStructure.I2C_Timing = 0x00902025;
+  I2C_InitStructure.I2C_Timing = 0x310309;
+  /*0b00010000010000100000111100010011*/
   
   /* Apply LSM303DLHC_I2C configuration after enabling it */
   I2C_Init(LSM303DLHC_I2C, &I2C_InitStructure);

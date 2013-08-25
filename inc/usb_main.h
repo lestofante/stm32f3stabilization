@@ -9,14 +9,21 @@
 #define USB_MAIN_H_
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
- void USB_Config(void);
- void USB_write(uint8_t*,uint16_t);
+enum packet_type_t {
+	SENSOR_GYR,
+	SENSOR_ACC,
+	SENSOR_MAG,
+	STRING
+};
+
+void USB_Config(void);
+void USB_write(uint8_t*,uint16_t, enum packet_type_t);
 
 #ifdef __cplusplus
- }
+}
 #endif
 
 #endif /* USB_MAIN_H_ */
