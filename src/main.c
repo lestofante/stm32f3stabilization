@@ -70,12 +70,6 @@ int main(void)
 
 	Compass_Config();
 
-	uint16_t temp_sensor_read[] = {0, 0, 0};
-
-	uint32_t lastGyro=0, lastacc=0, lastMagne=0, lastMicrosec=micros();
-	uint16_t read = 0, cicle = 0;
-	uint32_t ora = micros();
-
 	uint16_t toWrite[3];
 
 	while (1)
