@@ -15,5 +15,7 @@
 #include <stdint.h>
 
 extern uint32_t micros();
+extern void DelayMs(uint32_t);
+extern void DelayUs(uint32_t);
 
 #endif /* COMMON_H_ */
