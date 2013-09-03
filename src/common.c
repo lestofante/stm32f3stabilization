@@ -23,7 +23,10 @@ uint32_t micros()
 }
 
 void DelayMs(uint32_t delay){
-	DelayUs(delay*1000);
+	uint32_t i;
+	for (i=0; i < delay; i++){ //be sure we don't overflow!!!
+		DelayUs(1000);
+	}
 }
 
 void DelayUs(uint32_t delay){
