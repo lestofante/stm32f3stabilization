@@ -7,7 +7,7 @@
 
 #include "stm32f3_discovery_lsm303dlhc.h"
 #include "stm32f3_discovery_l3gd20.h"
-
+#include "sensors.h"
 
 
 #define L3G_Sensitivity_250dps     (float)   114.285f         /*!< gyroscope sensitivity with 250 dps full scale [LSB/dps] */

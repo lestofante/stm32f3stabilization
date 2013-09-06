@@ -16,7 +16,8 @@ enum packet_type_t {
 	SENSOR_GYR,
 	SENSOR_ACC,
 	SENSOR_MAG,
-	STRING
+	STRING,
+	DCM
 };
 
 void USB_Config(void);
