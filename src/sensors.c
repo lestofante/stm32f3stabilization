@@ -39,9 +39,9 @@ void Gyro_Config(void)
  *  MY SPECIAL VALUE
  */
 	L3GD20_InitStructure.Power_Mode = L3GD20_MODE_ACTIVE;
-	L3GD20_InitStructure.Output_DataRate = L3GD20_OUTPUT_DATARATE_3; //ODR = 760Hz
+	L3GD20_InitStructure.Output_DataRate = L3GD20_OUTPUT_DATARATE_4; //ODR = 760Hz
 	L3GD20_InitStructure.Axes_Enable = L3GD20_AXES_ENABLE;
-	L3GD20_InitStructure.Band_Width = L3GD20_BANDWIDTH_4; //CUT off 100
+	L3GD20_InitStructure.Band_Width = L3GD20_BANDWIDTH_1; //CUT off 100
 	L3GD20_InitStructure.BlockData_Update = L3GD20_BlockDataUpdate_Continous;
 	L3GD20_InitStructure.Endianness = L3GD20_BLE_MSB;
 	L3GD20_InitStructure.Full_Scale = L3GD20_FULLSCALE_2000;
@@ -114,7 +114,7 @@ void Compass_Config(void)
 	LSM303DLHC_InitStructure.Temperature_Sensor = LSM303DLHC_TEMPSENSOR_DISABLE;
 	LSM303DLHC_InitStructure.MagOutput_DataRate = LSM303DLHC_ODR_220_HZ;
 	//LSM303DLHC_InitStructure.MagFull_Scale = LSM303DLHC_FS_1_3_GA;
-	LSM303DLHC_InitStructure.MagFull_Scale = LSM303DLHC_FS_1_3_GA;
+	LSM303DLHC_InitStructure.MagFull_Scale = LSM303DLHC_FS_4_7_GA;
 
 	magnetometerZtoXY = LSM303DLHC_M_SENSITIVITY_Z_1_3Ga / LSM303DLHC_M_SENSITIVITY_XY_1_3Ga;//because z has different sensitivity
 
@@ -129,7 +129,7 @@ void Compass_Config(void)
 	LSM303DLHCAcc_InitStructure.Power_Mode = LSM303DLHC_NORMAL_MODE;
 	LSM303DLHCAcc_InitStructure.AccOutput_DataRate = LSM303DLHC_ODR_400_HZ;
 	LSM303DLHCAcc_InitStructure.Axes_Enable= LSM303DLHC_AXES_ENABLE;
-	LSM303DLHCAcc_InitStructure.AccFull_Scale = LSM303DLHC_FULLSCALE_8G;
+	LSM303DLHCAcc_InitStructure.AccFull_Scale = LSM303DLHC_FULLSCALE_2G;
 	LSM303DLHCAcc_InitStructure.BlockData_Update = LSM303DLHC_BlockUpdate_Continous;
 	LSM303DLHCAcc_InitStructure.Endianness=LSM303DLHC_BLE_MSB;
 	LSM303DLHCAcc_InitStructure.High_Resolution=LSM303DLHC_HR_ENABLE;
@@ -220,6 +220,7 @@ uint8_t Compass_ReadMag (uint16_t* pfData)
 	for(i=0; i<3; i++)
 	{
 		pfData[i]=((int16_t)((uint16_t)buffer[2*i] << 8) + buffer[2*i+1]);
+		LSM303DLHC_M_SENSITIVITY_Z_8_1Ga;
 	}
 
 	//pfData[1]*= magnetometerZtoXY; //because Z has different sensitivity

@@ -5696,7 +5696,7 @@ extern "C"
    * <code>in</code> is negative value and returns zero output for negative values.
    */
 
-  __STATIC_INLINE arm_status  arm_sqrt_f32(
+  __attribute__((always_inline)) __STATIC_INLINE arm_status  arm_sqrt_f32(
                       float32_t in, float32_t *pOut)
   {
     if(in > 0)
@@ -5707,6 +5707,8 @@ extern "C"
         *pOut = __sqrtf(in);
     #elif (__FPU_USED == 1) && defined ( __TMS_740 )
         *pOut = __builtin_sqrtf(in);
+	#elif (__FPU_USED == 1)
+        __ASM volatile ("vsqrt.f32 %0, %1" : "=w" (*pOut) : "w" (in) );
     #else
         *pOut = sqrtf(in);
     #endif
