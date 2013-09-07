@@ -32,7 +32,7 @@
 #include "sensors.h"
 #include "common.h"
 
-//#include "arm_math.h"
+#include "arm_math.h"
 
 /** @addtogroup STM32F3_Discovery_Peripheral_Examples
  * @
@@ -70,6 +70,8 @@ int main(void)
 
 	Compass_Config();
 
+	STM_EVAL_LEDInit(LED10);
+
 	uint16_t temp_sensor_read[] = {0, 0, 0};
 
 	uint32_t lastGyro=0, lastacc=0, lastMagne=0, lastMicrosec=micros();
@@ -77,6 +79,22 @@ int main(void)
 	uint32_t ora = micros();
 
 	uint16_t toWrite[3];
+	float Result;
+	float Data0, Data1=1.0f, Data2=2.0f;
+	uint16_t i = 0;
+
+	while (1){
+		/* Toggle LD4 */
+		STM_EVAL_LEDToggle(LED10);
+		uint32_t last = micros();
+		float out = 0;
+
+		for(i = 0; i<50000; i++){
+			arm_sqrt_f32(144,&out);
+		}
+		last = micros() - last;
+		micros();
+	}
 
 	while (1)
 	{
@@ -84,10 +102,13 @@ int main(void)
 			USB_write((uint8_t*)toWrite, 6, SENSOR_GYR);
 		if(Compass_ReadAcc(toWrite))
 			USB_write((uint8_t*)toWrite, 6, SENSOR_ACC);
-		if(Compass_ReadMag(toWrite))
+		if(Compass_ReadMag(toWrite)){
 			USB_write((uint8_t*)toWrite, 6, SENSOR_MAG);
+		}
 	}
 }
+
+
 
 #ifdef  USE_FULL_ASSERT
 
