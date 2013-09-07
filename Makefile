@@ -14,7 +14,7 @@ SIZE		= $(TC)-size
 
 ###################################################
 # Set Sources
-LIB_SRCS	= $(wildcard Libraries/STM32F30x_StdPeriph_Driver/src/*.c Libraries/STM32_USB-FS-Device_Driver/src/*.c Libraries/STM32F3_Discovery/src/*.c)
+LIB_SRCS	= $(wildcard Libraries/CMSIS/DSP_Lib/Source/FastMathFunctions/*.c Libraries/CMSIS/DSP_Lib/Source/BasicMathFunctions/*.c Libraries/STM32F30x_StdPeriph_Driver/src/*.c Libraries/STM32_USB-FS-Device_Driver/src/*.c Libraries/STM32F3_Discovery/src/*.c)
 USER_SRCS	= $(wildcard src/*.c Libraries/Goffredo_USB/src/*.c)
 
 # Set Objects
@@ -36,8 +36,9 @@ LIBS		= -lm -lc
 ###################################################
 # Set Board
 MCU 		= -mthumb -mcpu=cortex-m4
+#FPU 		= -mfloat-abi=soft
 FPU 		= -mfpu=fpv4-sp-d16 -mfloat-abi=hard
-DEFINES 	= -DSTM32F30X -DUSE_STDPERIPH_DRIVER
+DEFINES 	= -DSTM32F30X -DUSE_STDPERIPH_DRIVER -DARM_MATH_CM4
 
 # Set Compilation and Linking Flags
 CFLAGS 		= $(MCU) $(FPU) $(DEFINES) $(INCLUDES) \
@@ -51,7 +52,7 @@ LDFLAGS 	= $(MCU) $(FPU) -g -gdwarf-2\
 
 ###################################################
 # Default Target
-all: $(PROJ_NAME).hex $(PROJ_NAME).bin info
+all: clean $(PROJ_NAME).hex $(PROJ_NAME).bin info
 
 # elf Target
 $(PROJ_NAME).elf: $(LIB_OBJS) $(USER_OBJS)
@@ -78,7 +79,7 @@ info: $(PROJ_NAME).elf
 
 # Rule for .c files
 .c.o:
-	@$(CC) $(CFLAGS) -c -o $@ $<
+	@$(CC) $(CFLAGS) -c -dM -o $@ $<
 	@echo $@
 
 # Rule for .s files
