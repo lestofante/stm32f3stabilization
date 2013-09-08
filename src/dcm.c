@@ -7,7 +7,7 @@
 
 #include "dcm.h"
 
-float sampleFreq = 160;
+float sampleFreq = 140;
 float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 float twoKp = (2.0f * 0.1f);
 float twoKi = 2.0f * 0.0f;
@@ -42,13 +42,13 @@ void freeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, f
 		lastFreqUp = micros();
 	}
 	countImuUpdate++;
-	if (micros() - lastFreqUp >= 1000) {
+	if (micros() - lastFreqUp >= 1000000UL) { //every second
 		//System.out.println("Frequenza: " + count);
 		sampleFreq = countImuUpdate;
 		countImuUpdate = 0;
 		lastFreqUp = micros();
 	}
-	/* END DYANMIC FREQUENCY! */
+	/* END DYNAMIC FREQUENCY! */
 
 	float recipNorm;
 	float q0q0, q0q1, q0q2, q0q3, q1q1, q1q2, q1q3, q2q2, q2q3, q3q3;
@@ -192,4 +192,16 @@ void freeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, f
 	 System.out.print(q3+" ");
 	 System.out.println();
 	 */
+}
+
+void quaternionToYawPitchRoll(float *ypr) {
+  float gx, gy, gz; // estimated gravity direction
+
+  gx = 2 * (q1*q3 - q0*q2);
+  gy = 2 * (q0*q1 + q2*q3);
+  gz = q0*q0 - q1*q1 - q2*q2 + q3*q3;
+
+  ypr[0] = atan2(2 * q1 * q2 - 2 * q0 * q3, 2 * q0*q0 + 2 * q1 * q1 - 1);
+  ypr[1] = atan2(gx, sqrt(gy*gy + gz*gz));
+  ypr[2] = atan2(gy, sqrt(gx*gx + gz*gz));
 }

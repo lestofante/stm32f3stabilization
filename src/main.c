@@ -35,6 +35,7 @@
 #include "stm32f3_discovery.h"
 
 #define gyroToRad (2293.76/32768)*0.0174532925
+
 //#include "arm_math.h"
 
 /** @addtogroup STM32F3_Discovery_Peripheral_Examples
