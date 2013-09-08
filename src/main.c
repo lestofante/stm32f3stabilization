@@ -33,6 +33,8 @@
 #include "pwm.h"
 #include "dcm.h"
 #include "stm32f3_discovery.h"
+
+#define gyroToRad (2293.76/32768)*0.0174532925
 //#include "arm_math.h"
 
 /** @addtogroup STM32F3_Discovery_Peripheral_Examples
@@ -72,7 +74,7 @@ int main(void) {
 
 	//test();
 	init_pwm_tim4(); //50Hz pwm
-
+/*
 	uint8_t pwmDeciso = PWM_MIN;
 	while(1){
 		pwmDeciso++;
@@ -82,7 +84,7 @@ int main(void) {
 		setPwm(pwmDeciso, pwmDeciso, pwmDeciso, pwmDeciso);
 		DelayMs(1000);
 	}
-
+*/
 	/* Configure the USB */
 	USB_Config();
 
@@ -122,7 +124,7 @@ int main(void) {
 		if (Gyro_ReadAngRate(gyro)){
 			USB_write((uint8_t*) gyro, 6, SENSOR_GYR);
 			//-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz
-			freeIMUUpdate(-gyro[0],-gyro[1], gyro[2], -acc[1], acc[0], acc[2], -magne[1], magne[0], magne[2]);
+			freeIMUUpdate(-gyro[0]*gyroToRad,-gyro[1]*gyroToRad, gyro[2]*gyroToRad, -acc[1], acc[0], acc[2], -magne[1], magne[0], magne[2]);
 
 			getQuaternion(quaternion);
 
