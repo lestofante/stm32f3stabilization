@@ -9,7 +9,7 @@
 
 float sampleFreq = 140;
 float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
-float twoKp = (2.0f * 0.1f);
+float twoKp = (2.0f * 1.0f);
 float twoKi = 2.0f * 0.0f;
 
 //long lastUp = System.nanoTime();

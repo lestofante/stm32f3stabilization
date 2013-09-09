@@ -125,14 +125,14 @@ int main(void) {
 		if (Gyro_ReadAngRate(gyro)){
 			USB_write((uint8_t*) gyro, 6, SENSOR_GYR);
 			//-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz
-			freeIMUUpdate(-gyro[0]*gyroToRad,-gyro[1]*gyroToRad, gyro[2]*gyroToRad, -acc[1], acc[0], acc[2], -magne[1], magne[0], magne[2]);
+			freeIMUUpdate(-(short)gyro[0]*gyroToRad,-(short)gyro[1]*gyroToRad, (short)gyro[2]*gyroToRad, -(short)acc[1], (short)acc[0], (short)acc[2], -(short)magne[2], (short)magne[0], (short)magne[1]);
 
 			getQuaternion(quaternion);
 
 			USB_write((uint8_t*) quaternion, sizeof(float)*4, DCM);
 
 			//don't use again those values
-			acc[0] = acc[1] = acc[2] = magne[0] = magne[1] = magne[2] = 0;
+			//acc[0] = acc[1] = acc[2] = magne[0] = magne[1] = magne[2] = 0;
 		}
 	}
 }

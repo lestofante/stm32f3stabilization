@@ -52,7 +52,7 @@ LDFLAGS 	= $(MCU) $(FPU) -g -gdwarf-2\
 
 ###################################################
 # Default Target
-all: clean $(PROJ_NAME).hex $(PROJ_NAME).bin info
+all: $(PROJ_NAME).hex $(PROJ_NAME).bin info
 
 # elf Target
 $(PROJ_NAME).elf: $(LIB_OBJS) $(USER_OBJS)
