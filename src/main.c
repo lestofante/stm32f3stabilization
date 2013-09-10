@@ -114,6 +114,10 @@ int main(void) {
 	int16_t gyro[3], acc[3], magne[3];
 	float quaternion[4];
 
+
+	float yprFromRx[] = {0,0,0}; //this data will come from RX
+	uint16_t poweFromRx = 50; // actually can go from 0 to 100 (MAX_PWM-MIN_PWM)
+
 	while (1) {
 
 		if (Compass_ReadAcc(acc))
@@ -136,6 +140,7 @@ int main(void) {
 			quaternionToYawPitchRoll(ypr);
 
 			USB_write((uint8_t*) ypr, sizeof(float)*3, ANGLE);
+
 
 
 			//don't use again those values

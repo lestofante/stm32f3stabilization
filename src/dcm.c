@@ -24,18 +24,19 @@ float integralFBx;
 float integralFBy;
 float integralFBz;
 
-float invSqrt(float n){
-	return 1/sqrt(n);
+float invSqrt(float n) {
+	return 1 / sqrt(n);
 }
 
-void getQuaternion(float* q){
+void getQuaternion(float* q) {
 	q[0] = q0;
 	q[1] = q1;
 	q[2] = q2;
 	q[3] = q3;
 }
 
-void freeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) {
+void freeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az,
+		float mx, float my, float mz) {
 
 	/* DYANMIC FREQUENCY! */
 	if (countImuUpdate == -1) { //just the first time!
@@ -195,13 +196,25 @@ void freeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, f
 }
 
 void quaternionToYawPitchRoll(float *ypr) {
-  float gx, gy, gz; // estimated gravity direction
 
-  gx = 2 * (q1*q3 - q0*q2);
-  gy = 2 * (q0*q1 + q2*q3);
-  gz = q0*q0 - q1*q1 - q2*q2 + q3*q3;
-
-  ypr[0] = atan2(2 * q1 * q2 - 2 * q0 * q3, 2 * q0*q0 + 2 * q1 * q1 - 1);
-  ypr[1] = atan2(gx, sqrt(gy*gy + gz*gz));
-  ypr[2] = atan2(gy, sqrt(gx*gx + gz*gz));
+	float sqw = q3 * q3;
+	float sqx = q0 * q0;
+	float sqy = q1 * q1;
+	float sqz = q2 * q2;
+	float unit = sqx + sqy + sqz + sqw; // if normalized is one, otherwise
+	// is correction factor
+	float test = q0 * q1 + q2 * q3;
+	if (test > 0.499 * unit) { // singularity at north pole
+		ypr[1] = 2 * atan2(q0, q3);
+		ypr[2] = M_PI / 2;
+		ypr[0] = 0;
+	} else if (test < -0.499 * unit) { // singularity at south pole
+		ypr[1] = -2 * atan2(q0, q3);
+		ypr[2] = -M_PI / 2;
+		ypr[0] = 0;
+	} else {
+		ypr[1] = atan2(2 * q1 * q3 - 2 * q0 * q2, sqx - sqy - sqz + sqw); // roll or heading
+		ypr[2] = asin(2 * test / unit); // pitch or attitude
+		ypr[0] = atan2(2 * q0 * q3 - 2 * q1 * q2, -sqx + sqy - sqz + sqw); // yaw or bank
+	}
 }
