@@ -23,6 +23,7 @@ enum packet_type_t {
 
 void USB_Config(void);
 void USB_write(uint8_t*,uint16_t, enum packet_type_t);
+int USB_read(uint8_t*);
 
 #ifdef __cplusplus
 }

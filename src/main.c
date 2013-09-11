@@ -33,6 +33,7 @@
 #include "pwm.h"
 #include "dcm.h"
 #include "stm32f3_discovery.h"
+#include <stdlib.h>
 
 #define gyroToRad (2293.76/32768)*0.0174532925
 
@@ -111,9 +112,10 @@ int main(void) {
 
 	Compass_Config();
 
-	int16_t gyro[3], acc[3], magne[3];
+	uint16_t gyro[3], acc[3], magne[3];
 	float quaternion[4];
-
+	uint8_t test[4];
+	int result = 0;
 
 	float yprFromRx[] = {0,0,0}; //this data will come from RX
 	uint16_t poweFromRx = 50; // actually can go from 0 to 100 (MAX_PWM-MIN_PWM)
@@ -146,6 +148,8 @@ int main(void) {
 			//don't use again those values
 			acc[0] = acc[1] = acc[2] = magne[0] = magne[1] = magne[2] = 0;
 		}
+
+		result = USB_Read(test);
 	}
 }
 
