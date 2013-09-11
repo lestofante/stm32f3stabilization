@@ -16,8 +16,8 @@
   *
   *        http://www.st.com/software_license_agreement_liberty_v2
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
@@ -84,7 +84,7 @@ const uint8_t Joystick_ConfigDescriptor[MIC_SIZ_CONFIG_DESC] =
   {
     0x09, /* bLength: Configuration Descriptor size */
     USB_CONFIGURATION_DESCRIPTOR_TYPE, /* bDescriptorType: Configuration */
-    27,    /* wTotalLength: Bytes returned */
+    36,    /* wTotalLength: Bytes returned */
     0x00,
     0x01,         /*bNumInterfaces: 1 interfaces*/
     0x01,         /*bConfigurationValue: Configuration value*/
@@ -99,7 +99,7 @@ const uint8_t Joystick_ConfigDescriptor[MIC_SIZ_CONFIG_DESC] =
     USB_INTERFACE_DESCRIPTOR_TYPE,/*bDescriptorType: Interface descriptor type*/
     0x00,         /*bInterfaceNumber: Number of Interface*/
     0x00,         /*bAlternateSetting: Alternate setting*/
-    0x01,         /*bNumEndpoints*/
+    0x02,         /*bNumEndpoints*/
     0xff,         /*bInterfaceClass: custom*/
     0xff,         /*bInterfaceSubClass : custom Control*/
     0x00,         /*nInterfaceProtocol : Unused*/
@@ -109,6 +109,17 @@ const uint8_t Joystick_ConfigDescriptor[MIC_SIZ_CONFIG_DESC] =
     0x09,
     0x05,
     0x81,
+    0x02,
+    64, /*maxPacketSize*/
+    0x00,
+    0x01,
+    0x00,
+    0x00,
+
+    /*standard endpoint descriptor*/
+    0x09,
+    0x05,
+    0x02,
     0x02,
     64, /*maxPacketSize*/
     0x00,

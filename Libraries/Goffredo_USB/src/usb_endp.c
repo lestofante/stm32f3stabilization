@@ -42,9 +42,6 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-extern __IO uint8_t READY;
-
-uint32_t count = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -57,6 +54,16 @@ uint32_t count = 0;
 void EP1_IN_Callback(void)
 {
 	READY = 1;
+}
+
+/**
+ * @brief  EP1 IN Callback Routine.
+ * @param  None
+ * @retval None
+ */
+void EP2_OUT_Callback(void)
+{
+	DATA_PRESENT = 1;
 }
 /**
  * @}
