@@ -111,8 +111,12 @@ int main(void) {
 
 	Compass_Config();
 
-	uint16_t gyro[3], acc[3], magne[3];
+	int16_t gyro[3], acc[3], magne[3];
 	float quaternion[4];
+
+
+	float yprFromRx[] = {0,0,0}; //this data will come from RX
+	uint16_t poweFromRx = 50; // actually can go from 0 to 100 (MAX_PWM-MIN_PWM)
 
 	while (1) {
 
@@ -125,14 +129,22 @@ int main(void) {
 		if (Gyro_ReadAngRate(gyro)){
 			USB_write((uint8_t*) gyro, 6, SENSOR_GYR);
 			//-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz
-			freeIMUUpdate(-(short)gyro[0]*gyroToRad,-(short)gyro[1]*gyroToRad, (short)gyro[2]*gyroToRad, -(short)acc[1], (short)acc[0], (short)acc[2], -(short)magne[2], (short)magne[0], (short)magne[1]);
+			freeIMUUpdate(-gyro[0]*gyroToRad,-gyro[1]*gyroToRad, gyro[2]*gyroToRad, -acc[1], acc[0], acc[2], -magne[2], magne[0], magne[1]);
 
 			getQuaternion(quaternion);
 
 			USB_write((uint8_t*) quaternion, sizeof(float)*4, DCM);
 
+			float ypr[3];
+
+			quaternionToYawPitchRoll(ypr);
+
+			USB_write((uint8_t*) ypr, sizeof(float)*3, ANGLE);
+
+
+
 			//don't use again those values
-			//acc[0] = acc[1] = acc[2] = magne[0] = magne[1] = magne[2] = 0;
+			acc[0] = acc[1] = acc[2] = magne[0] = magne[1] = magne[2] = 0;
 		}
 	}
 }

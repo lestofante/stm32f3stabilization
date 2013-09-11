@@ -13,4 +13,5 @@
 
 extern void freeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
 extern void getQuaternion(float* q);
+extern void quaternionToYawPitchRoll(float *ypr);
 #endif /* DCM_H_ */

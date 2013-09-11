@@ -114,7 +114,7 @@ void setPwm(uint8_t eng1, uint8_t eng2, uint8_t eng3, uint8_t eng4) {
 	if (eng1 > PWM_MAX) {
 		eng1 = PWM_MAX;
 	}
-	TIM_SetCompare1(TIM4, eng1*100);
+	TIM_SetCompare1(TIM4, eng1*10);
 
 	if (eng2 < PWM_MIN) {
 		eng2 = PWM_MIN;
@@ -122,7 +122,7 @@ void setPwm(uint8_t eng1, uint8_t eng2, uint8_t eng3, uint8_t eng4) {
 	if (eng2 > PWM_MAX) {
 		eng2 = PWM_MAX;
 	}
-	TIM_SetCompare2(TIM4, eng2*100);
+	TIM_SetCompare2(TIM4, eng2*10);
 
 	if (eng3 < PWM_MIN) {
 		eng3 = PWM_MIN;
@@ -130,7 +130,7 @@ void setPwm(uint8_t eng1, uint8_t eng2, uint8_t eng3, uint8_t eng4) {
 	if (eng3 > PWM_MAX) {
 		eng3 = PWM_MAX;
 	}
-	TIM_SetCompare3(TIM4, eng3*100);
+	TIM_SetCompare3(TIM4, eng3*10);
 
 	if (eng4 < PWM_MIN) {
 		eng4 = PWM_MIN;
@@ -138,5 +138,5 @@ void setPwm(uint8_t eng1, uint8_t eng2, uint8_t eng3, uint8_t eng4) {
 	if (eng4 > PWM_MAX) {
 		eng4 = PWM_MAX;
 	}
-	TIM_SetCompare4(TIM4, eng4*100);
+	TIM_SetCompare4(TIM4, eng4*10);
 }
