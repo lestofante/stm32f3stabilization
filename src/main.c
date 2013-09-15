@@ -32,10 +32,12 @@
 #include "common.h"
 #include "pwm.h"
 #include "dcm.h"
+#include "pid.h"
 #include "stm32f3_discovery.h"
 #include <stdlib.h>
 
 #define gyroToRad (2293.76/32768)*0.0174532925
+#define SAMPLE_PID 50000
 
 //#include "arm_math.h"
 
@@ -51,6 +53,7 @@
 /* Private define ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 RCC_ClocksTypeDef RCC_Clocks;
+struct PidStruct arrayOfPid[];
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -118,7 +121,14 @@ int main(void) {
 	int result = 0;
 
 	float yprFromRx[] = {0,0,0}; //this data will come from RX
-	uint16_t poweFromRx = 50; // actually can go from 0 to 100 (MAX_PWM-MIN_PWM)
+	uint16_t poweFromRx = 1200; // actually can go from 0 to 100 (MAX_PWM-MIN_PWM)
+	int lastTime;
+
+	float ypr[3];
+	float pid_out[4];
+	init(SAMPLE_PID);
+
+	addPid(&ypr[1], &yprFromRx[2], &pid_out[2], 100.0f, 0, 0, -300, 300);
 
 	while (1) {
 
@@ -131,25 +141,32 @@ int main(void) {
 		if (Gyro_ReadAngRate(gyro)){
 			USB_write((uint8_t*) gyro, 6, SENSOR_GYR);
 			//-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz
-			freeIMUUpdate(-gyro[0]*gyroToRad,-gyro[1]*gyroToRad, gyro[2]*gyroToRad, -acc[1], acc[0], acc[2], -magne[2], magne[0], magne[1]);
+			freeIMUUpdate(-(short)gyro[0]*gyroToRad,-(short)gyro[1]*gyroToRad, (short)gyro[2]*gyroToRad, -(short)acc[1], (short)acc[0], (short)acc[2], -(short)magne[2], (short)magne[0], (short)magne[1]);
 
 			getQuaternion(quaternion);
 
 			USB_write((uint8_t*) quaternion, sizeof(float)*4, DCM);
 
-			float ypr[3];
+
 
 			quaternionToYawPitchRoll(ypr);
 
 			USB_write((uint8_t*) ypr, sizeof(float)*3, ANGLE);
 
 
-
 			//don't use again those values
 			acc[0] = acc[1] = acc[2] = magne[0] = magne[1] = magne[2] = 0;
 		}
 
-		result = USB_Read(test);
+		if(compute()){
+			lastTime = micros();
+			setPwm((poweFromRx+(int)pid_out[2])/10,(poweFromRx-(int)pid_out[2])/10,0,0);
+			char str[20];
+			int numChar = sprintf(str, "%d, %f, %f, %f", (poweFromRx+(int)pid_out[2])/10, ypr[1], yprFromRx[2], pid_out[2]);
+			USB_write((uint8_t*) str, numChar+1, STRING);
+		}
+
+		result = USB_read(test);
 	}
 }
 

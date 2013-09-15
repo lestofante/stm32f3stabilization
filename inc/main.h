@@ -42,6 +42,7 @@
 #include "usb_istr.h"
 #include "stm32f30x_it.h"
 #include "usb_desc.h"
+#include "pid.h"
 
 
 /* Exported types ------------------------------------------------------------*/

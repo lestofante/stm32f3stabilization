@@ -62,14 +62,14 @@ void init_pwm_tim4() {
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 
 	TIM_OCInitStructure.TIM_Pulse = 800; // preset pulse width 0..pwm_period
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; // Pulse polarity
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low; // Pulse polarity
 	//	  TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;
 	TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Set;
-
+/*
 	// These settings must be applied on the timer 1.
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Disable;
 	TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;
-	TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Set;
+	TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Set;*/
 
 // Setup four channels
 	// Channel 1, pin PD10?
