@@ -7,6 +7,9 @@
 
 #include "pid.h"
 
+uint8_t numberOfPid;
+struct PidStruct arrayOfPid[];
+
 void init(uint32_t sample_time){
 	lastTimePID = micros();
 	SampleTimePID = sample_time;
