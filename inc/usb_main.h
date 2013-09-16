@@ -18,7 +18,8 @@ enum packet_type_t {
 	SENSOR_MAG,
 	STRING,
 	DCM,
-	ANGLE
+	ANGLE,
+	PWM
 };
 
 void USB_Config(void);
