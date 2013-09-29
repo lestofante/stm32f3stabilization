@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    USB_Example/main.h 
+  * @file    ADC_Example/main.h 
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    20-September-2012
@@ -23,8 +23,8 @@
   * limitations under the License.
   *
   ******************************************************************************
-  */
-  
+  */ 
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MAIN_H
 #define __MAIN_H
@@ -32,27 +32,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f30x.h"
 #include "stm32f3_discovery.h"
-#include <stdio.h>
-#include "stm32f3_discovery_lsm303dlhc.h"
-#include "usb_lib.h"
-#include "hw_config.h"
-#include "usb_pwr.h"
-#include "platform_config.h"
-#include <math.h>
-#include "usb_istr.h"
 #include "stm32f30x_it.h"
-#include "usb_desc.h"
-#include "pid.h"
-
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-void USB_Config (void);
-void Acc_Config(void);
-void Acc_ReadData(float* pfData);
-
+void Delay(__IO uint32_t nTime);
 #endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

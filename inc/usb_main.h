@@ -19,7 +19,8 @@ enum packet_type_t {
 	STRING,
 	DCM,
 	ANGLE,
-	PWM
+	PWM,
+	RPM
 };
 
 void USB_Config(void);

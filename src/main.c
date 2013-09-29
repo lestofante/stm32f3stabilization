@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file    USB_Example/main.c
+ * @file    ADC_Example/main.c
  * @author  MCD Application Team
  * @version V1.1.0
  * @date    20-September-2012
@@ -28,176 +28,185 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_main.h"
-#include "sensors.h"
+#include <stdio.h>
 #include "common.h"
-#include "pwm.h"
-#include "dcm.h"
-#include "pid.h"
-#include "stm32f3_discovery.h"
-#include <stdlib.h>
-
-#define gyroToRad (2293.76/32768)*0.0174532925
-#define SAMPLE_PID 50000
-
-//#include "arm_math.h"
 
 /** @addtogroup STM32F3_Discovery_Peripheral_Examples
- * @
+ * @{
  */
 
-/** @addtogroup USB_Example
+/** @addtogroup ADC_Example
  * @{
  */
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+/* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-RCC_ClocksTypeDef RCC_Clocks;
-TIM_ICInitTypeDef  TIM_ICInitStructure;
-__IO uint32_t CCR1;
-
+__IO uint16_t  ADC1ConvertedVoltage = 0, calibration_value = 0;
+__IO int16_t ADC1ConvertedValue = 0;
+__IO uint32_t TimingDelay = 0;
+__IO uint32_t UserButtonPressed = 1;
+ADC_InitTypeDef       ADC_InitStructure;
+ADC_CommonInitTypeDef ADC_CommonInitStructure;
+GPIO_InitTypeDef      GPIO_InitStructure;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
+
 /**
  * @brief  Main program.
  * @param  None
  * @retval None
  */
-int main(void) {
-	/* SysTick end of count event each 1us */
-	RCC_GetClocksFreq(&RCC_Clocks);
-	SysTick_Config((RCC_Clocks.HCLK_Frequency / 1000000UL));
+int main(void)
+{
+	/*!< At this stage the microcontroller clock setting is already configured,
+       this is done through SystemInit() function which is called from startup
+       file (startup_stm32f30x.s) before to branch to application main.
+       To reconfigure the default setting of SystemInit() function, refer to
+       system_stm32f30x.c file
+	 */
 
-	STM_EVAL_LEDInit(LED3); //used has heartBeat
+	/* Configure the ADC clock */
+	RCC_ADCCLKConfig(RCC_ADC12PLLCLK_Div2);
+
+	/* Enable ADC1 clock */
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_ADC12, ENABLE);
+
+	/* Setup SysTick Timer for 1 �sec interrupts  */
+	if (SysTick_Config(SystemCoreClock / 1000000))
+	{
+		/* Capture error */
+		while (1)
+		{}
+	}
+
+	USB_Config();
+
 	STM_EVAL_LEDInit(LED4);
 	STM_EVAL_LEDInit(LED5);
 	STM_EVAL_LEDInit(LED6);
-	STM_EVAL_LEDInit(LED7);
-	STM_EVAL_LEDInit(LED8);
 
-	init_pwm_tim2();
-
-	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
-	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-	TIM_ICInitStructure.TIM_ICFilter = 0x0;
-
-	TIM_PWMIConfig(TIM2, &TIM_ICInitStructure);
-
-	/* Select the TIM2 Input Trigger: TI2FP2 */
-	TIM_SelectInputTrigger(TIM2, TIM_TS_TI2FP2);
-
-	/* Select the slave Mode: Reset Mode */
-	TIM_SelectSlaveMode(TIM2, TIM_SlaveMode_Reset);
-	TIM_SelectMasterSlaveMode(TIM2,TIM_MasterSlaveMode_Enable);
-
-	/* TIM enable counter */
-	TIM_Cmd(TIM2, ENABLE);
-
-	/* Enable the CC2 Interrupt Request */
-	TIM_ITConfig(TIM2, TIM_IT_CC2, ENABLE);
-	/*
-	 STM_EVAL_LEDOff(LED3);
-	 STM_EVAL_LEDOff(LED4);
-	 STM_EVAL_LEDOff(LED5);
-	 */
-
-	//test();
-	init_pwm_tim4(); //50Hz pwm
-	/*
-	uint8_t pwmDeciso = PWM_MIN;
-	while(1){
-		pwmDeciso++;
-		if (pwmDeciso > PWM_MAX) {
-			pwmDeciso = PWM_MIN; //restart!
-		}
-		setPwm(pwmDeciso, pwmDeciso, pwmDeciso, pwmDeciso);
-		DelayMs(1000);
-	}
-	 */
-	/* Configure the USB */
-	USB_Config();
-
-	//saluta!
-	USB_write((uint8_t*) "ciao", 5, STRING);
-
-	//led check
-	STM_EVAL_LEDOn(LED4);
-	DelayMs(1000);
-	STM_EVAL_LEDOff(LED4);
-	DelayMs(1000);
 	STM_EVAL_LEDOn(LED5);
-	DelayMs(1000);
-	STM_EVAL_LEDOff(LED5);
-	DelayMs(1000);
-	STM_EVAL_LEDOn(LED6);
-	//DelayMs(1000);
-	//STM_EVAL_LEDOff(LED6);
+
+	/* ADC Channel configuration */
+	/* GPIOC Periph clock enable */
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
+
+	/* Configure ADC Channel7 as analog input */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 ;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	ADC_StructInit(&ADC_InitStructure);
+
+	/* Calibration procedure */
+	ADC_VoltageRegulatorCmd(ADC1, ENABLE);
+
+
+	/* Insert delay equal to 10 �s */
+	DelayMs(10000);
+
+	ADC_SelectCalibrationMode(ADC1, ADC_CalibrationMode_Single);
+	ADC_StartCalibration(ADC1);
+
+	while(ADC_GetCalibrationStatus(ADC1) != RESET );
+	calibration_value = ADC_GetCalibrationValue(ADC1);
+
+	ADC_CommonInitStructure.ADC_Mode = ADC_Mode_Independent;
+	ADC_CommonInitStructure.ADC_Clock = ADC_Clock_AsynClkMode;
+	ADC_CommonInitStructure.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;
+	ADC_CommonInitStructure.ADC_DMAMode = ADC_DMAMode_OneShot;
+	ADC_CommonInitStructure.ADC_TwoSamplingDelay = 0;
+	ADC_CommonInit(ADC1, &ADC_CommonInitStructure);
+
+	ADC_InitStructure.ADC_ContinuousConvMode = ADC_ContinuousConvMode_Enable;
+	ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
+	ADC_InitStructure.ADC_ExternalTrigConvEvent = ADC_ExternalTrigConvEvent_0;
+	ADC_InitStructure.ADC_ExternalTrigEventEdge = ADC_ExternalTrigEventEdge_None;
+	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+	ADC_InitStructure.ADC_OverrunMode = ADC_OverrunMode_Disable;
+	ADC_InitStructure.ADC_AutoInjMode = ADC_AutoInjec_Disable;
+	ADC_InitStructure.ADC_NbrOfRegChannel = 1;
+	ADC_Init(ADC1, &ADC_InitStructure);
+
+	/* ADC1 regular channel7 configuration */
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 1, ADC_SampleTime_7Cycles5);
+
+	/* Enable ADC1 */
+	ADC_Cmd(ADC1, ENABLE);
+
+	/* wait for ADRDY */
+	while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_RDY));
+
+	/* Start ADC1 Software Conversion */
+	ADC_StartConversion(ADC1);
+
+	STM_EVAL_LEDOn(LED4);
+
+	int ON = 0, count = 0;
+	float rpm = 0;
+	uint32_t lastTime, delta, newTime;
 
 	/* Infinite loop */
+	while (1)
+	{
+		/* Test EOC flag */
+		while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
 
-	Gyro_Config();
+		/* Get ADC1 converted data */
+		ADC1ConvertedValue = (int16_t)ADC_GetConversionValue(ADC1);
+		float mV = ADC1ConvertedValue * 3300 / 4096.0f;
 
-	Compass_Config();
+		if(ON==0){
+			if(ADC1ConvertedValue > 2600){
+				newTime = micros();
+				delta = newTime - lastTime;
+				lastTime = newTime;
+				//count++;
+				ON = 1;
+			}
+		} else {
+			if(ADC1ConvertedValue < 200){
+				ON = 0;
+			}
+		}
+/*
+		newTime = micros();
 
-	uint16_t gyro[3], acc[3], magne[3];
-	float quaternion[4];
-	uint8_t test[4];
-	int result = 0;
+		if(newTime-lastTime>1000000){
+			lastTime = newTime;
+			rpm = count;
+			count = 0;
+			rpm = 0;
+		}
+*/
+		rpm = 60000000.0f/delta;
+		count++;
+		if(count>1000){
+			count=0;
 
-	float yprFromRx[] = {0,0,0}; //this data will come from RX
-	uint16_t poweFromRx = 1200; // actually can go from 0 to 100 (MAX_PWM-MIN_PWM)
-	int lastTime;
-
-	float ypr[3];
-	float pid_out[4];
-	init(SAMPLE_PID);
-
-	addPid(&ypr[1], &yprFromRx[2], &pid_out[2], 60.0f, 0.0f, 0.0f, -300, 300);
-
-	while (1) {
-
-		USB_write((uint8_t*) &CCR1, 4, PWM);
-
-		if (Compass_ReadAcc(acc))
-			USB_write((uint8_t*) acc, 6, SENSOR_ACC);
-		if (Compass_ReadMag(magne)) {
-			USB_write((uint8_t*) magne, 6, SENSOR_MAG);
+			if (UserButtonPressed==1)
+				USB_write((uint8_t*) &rpm, 4, RPM);
+			else
+				USB_write((uint8_t*) &mV, 4, RPM);
 		}
 
-		if (Gyro_ReadAngRate(gyro)){
-			USB_write((uint8_t*) gyro, 6, SENSOR_GYR);
-			//-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz
-			freeIMUUpdate(-(short)gyro[0]*gyroToRad,-(short)gyro[1]*gyroToRad, (short)gyro[2]*gyroToRad, -(short)acc[1], (short)acc[0], (short)acc[2], -(short)magne[2], (short)magne[0], (short)magne[1]);
 
-			getQuaternion(quaternion);
-
-			USB_write((uint8_t*) quaternion, sizeof(float)*4, DCM);
-
-
-
-			quaternionToYawPitchRoll(ypr);
-
-			USB_write((uint8_t*) ypr, sizeof(float)*3, ANGLE);
-
-
-			//don't use again those values
-			acc[0] = acc[1] = acc[2] = magne[0] = magne[1] = magne[2] = 0;
-		}
-
-		if(compute()){
-			lastTime = micros();
-			int motRx = (poweFromRx+(int)pid_out[2]);
-			int motSx = (poweFromRx-(int)pid_out[2]);
-			setPwm(motRx,motSx,0,0);
-			char str[20];
-			int numChar = sprintf(str, "%d, %f, %f, %f", motRx, ypr[1], yprFromRx[2], pid_out[2]);
-			USB_write((uint8_t*) str, numChar+1, STRING);
-		}
-
-		result = USB_read(test);
 	}
+}
+
+/**
+ * @brief  Inserts a delay time.
+ * @param  nTime: specifies the delay time length, in milliseconds.
+ * @retval None
+ */
+void Delay(__IO uint32_t nTime)
+{ 
+	TimingDelay = nTime;
+
+	while(TimingDelay != 0);
 }
 
 #ifdef  USE_FULL_ASSERT
@@ -210,9 +219,9 @@ int main(void) {
  * @retval None
  */
 void assert_failed(uint8_t* file, uint32_t line)
-{
+{ 
 	/* User can add his own implementation to report the file name and line number,
-	 ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
 
 	/* Infinite loop */
 	while (1)
