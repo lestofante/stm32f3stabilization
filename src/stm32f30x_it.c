@@ -47,6 +47,9 @@ __IO uint16_t DutyCycle = 0;
 __IO uint32_t Frequency = 0;
 __IO uint32_t CCR1 = 0;
 RCC_ClocksTypeDef RCC_Clocks;
+extern __IO uint32_t UserButtonPressed;
+__IO uint32_t i2 =0;
+
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -194,6 +197,41 @@ void TIM2_IRQHandler(void)
 
 	/* Clear TIM2 Capture compare interrupt pending bit */
 	TIM_ClearITPendingBit(TIM2, TIM_IT_CC2);
+}
+
+/**
+ * @brief  This function handles EXTI0_IRQ Handler.
+ * @param  None
+ * @retval None
+ */
+void EXTI0_IRQHandler(void)
+{
+	if ((EXTI_GetITStatus(USER_BUTTON_EXTI_LINE) == SET)&&(STM_EVAL_PBGetState(BUTTON_USER) != RESET))
+	{
+
+		/* Delay */
+		for(i2=0; i2<0x7FFFF; i2++);
+
+		/* Wait for SEL button to be pressed  */
+		while(STM_EVAL_PBGetState(BUTTON_USER) != RESET);
+		/* Delay */
+		for(i2=0; i2<0x7FFFF; i2++);
+		UserButtonPressed++;
+
+		STM_EVAL_LEDToggle(LED6);
+		if(UserButtonPressed==2)
+			STM_EVAL_LEDToggle(LED7);
+
+
+		if (UserButtonPressed > 0x2)
+		{
+			UserButtonPressed = 0x0;
+		}
+
+
+		/* Clear the EXTI line pending bit */
+		EXTI_ClearITPendingBit(USER_BUTTON_EXTI_LINE);
+	}
 }
 
 #if defined (USB_INT_DEFAULT)

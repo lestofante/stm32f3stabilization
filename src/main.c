@@ -86,6 +86,10 @@ int main(void)
 	STM_EVAL_LEDInit(LED4);
 	STM_EVAL_LEDInit(LED5);
 	STM_EVAL_LEDInit(LED6);
+	STM_EVAL_LEDInit(LED7);
+
+	/* Configure the Key button in EXTI mode */
+	STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
 
 	STM_EVAL_LEDOn(LED5);
 
@@ -106,7 +110,7 @@ int main(void)
 
 
 	/* Insert delay equal to 10 �s */
-	DelayMs(10000);
+	DelayMs(1000);
 
 	ADC_SelectCalibrationMode(ADC1, ADC_CalibrationMode_Single);
 	ADC_StartCalibration(ADC1);
@@ -132,7 +136,7 @@ int main(void)
 	ADC_Init(ADC1, &ADC_InitStructure);
 
 	/* ADC1 regular channel7 configuration */
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 1, ADC_SampleTime_7Cycles5);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 1, ADC_SampleTime_601Cycles5);
 
 	/* Enable ADC1 */
 	ADC_Cmd(ADC1, ENABLE);
@@ -145,8 +149,8 @@ int main(void)
 
 	STM_EVAL_LEDOn(LED4);
 
-	int ON = 0, count = 0;
-	float rpm = 0;
+	int ON = 0, usb_count=0;
+	float rpm = 0, count = 0;
 	uint32_t lastTime, delta, newTime;
 
 	/* Infinite loop */
@@ -164,7 +168,7 @@ int main(void)
 				newTime = micros();
 				delta = newTime - lastTime;
 				lastTime = newTime;
-				//count++;
+				count++;
 				ON = 1;
 			}
 		} else {
@@ -172,7 +176,7 @@ int main(void)
 				ON = 0;
 			}
 		}
-/*
+		/*
 		newTime = micros();
 
 		if(newTime-lastTime>1000000){
@@ -181,16 +185,18 @@ int main(void)
 			count = 0;
 			rpm = 0;
 		}
-*/
+		 */
 		rpm = 60000000.0f/delta;
-		count++;
-		if(count>1000){
-			count=0;
+		usb_count++;
+		if(usb_count>100){
+			usb_count=0;
 
-			if (UserButtonPressed==1)
+			if (UserButtonPressed==0)
 				USB_write((uint8_t*) &rpm, 4, RPM);
-			else
+			else if(UserButtonPressed==1)
 				USB_write((uint8_t*) &mV, 4, RPM);
+			else
+				USB_write((uint8_t*) &count, 4, RPM);
 		}
 
 
