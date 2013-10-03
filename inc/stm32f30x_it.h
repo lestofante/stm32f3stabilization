@@ -62,4 +62,7 @@ void USBWakeUp_RMP_IRQHandler(void);
 
 #endif /* __STM32F30X_IT_H */
 
+ /*Exported variables*/
+ extern __IO uint32_t IC2Value;
+ extern __IO uint32_t CCR1;
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

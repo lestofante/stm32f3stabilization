@@ -14,10 +14,12 @@
 #include "stm32f30x_conf.h"
 
 //BECAUSE 800
-#define PWM_MIN 80
-#define PWM_MAX 180
+#define PWM_MIN 800
+#define PWM_MAX 1800
 
-extern void init_pwm_tim4(void);
-extern void setPwm(uint8_t, uint8_t, uint8_t, uint8_t);
+void init_pwm_tim4(void);
+void init_pwm_tim2(void);
+
+extern void setPwm(uint16_t, uint16_t, uint16_t, uint16_t);
 
 #endif /* PWM_H_ */

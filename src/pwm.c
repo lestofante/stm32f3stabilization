@@ -7,7 +7,33 @@
 
 #include "pwm.h"
 
+void init_pwm_tim2() {
+	GPIO_InitTypeDef GPIO_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
 
+	/* TIM2 clock enable */
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
+	/* GPIOB clock enable */
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+
+	/* TIM2 chennel2 configuration : PA.01 */
+	GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_1;
+	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP ;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	/* Connect TIM pin to AF1 */
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource1, GPIO_AF_1);
+
+	/* Enable the TIM2 global Interrupt */
+	NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+}
 
 void init_pwm_tim4() {
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -20,7 +46,7 @@ void init_pwm_tim4() {
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 	/* Connect TIM4 pins to AF2 */
@@ -41,12 +67,12 @@ void init_pwm_tim4() {
 
 	uint16_t prescaler = (uint16_t) ((72000000 / 1000000) - 1); // Shooting for 1 MHz, (1us)
 
-	uint32_t pwm_period = 20000;
+	uint32_t pwm_period = 2000;
 
-//  Enable the TIM4 peripherie
+	//  Enable the TIM4 peripherie
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 
-// Setup the timing and configure the TIM1 timer
+	// Setup the timing and configure the TIM1 timer
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 	TIM_TimeBaseStructure.TIM_Prescaler = prescaler;
@@ -55,23 +81,23 @@ void init_pwm_tim4() {
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up ;
 	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
 
-// Initialise the timer channels
+	// Initialise the timer channels
 	TIM_OCInitTypeDef TIM_OCInitStructure;
 
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 
-	TIM_OCInitStructure.TIM_Pulse = 800; // preset pulse width 0..pwm_period
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low; // Pulse polarity
+	TIM_OCInitStructure.TIM_Pulse = 10; // preset pulse width 0..pwm_period
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; // Pulse polarity
 	//	  TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;
 	TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Set;
-/*
+
 	// These settings must be applied on the timer 1.
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Disable;
-	TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;
-	TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Set;*/
+	TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_Low;
+	TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Set;
 
-// Setup four channels
+	// Setup four channels
 	// Channel 1, pin PD10?
 	TIM_OC1Init(TIM4, &TIM_OCInitStructure);
 	TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable );
@@ -107,14 +133,14 @@ void init_pwm_tim4() {
 	//return pwm_period;
 }
 
-void setPwm(uint8_t eng1, uint8_t eng2, uint8_t eng3, uint8_t eng4) {
+void setPwm(uint16_t eng1, uint16_t eng2, uint16_t eng3, uint16_t eng4) {
 	if (eng1 < PWM_MIN) {
 		eng1 = PWM_MIN;
 	}
 	if (eng1 > PWM_MAX) {
 		eng1 = PWM_MAX;
 	}
-	TIM_SetCompare1(TIM4, eng1*10);
+	TIM_SetCompare1(TIM4, eng1);
 
 	if (eng2 < PWM_MIN) {
 		eng2 = PWM_MIN;
@@ -122,7 +148,7 @@ void setPwm(uint8_t eng1, uint8_t eng2, uint8_t eng3, uint8_t eng4) {
 	if (eng2 > PWM_MAX) {
 		eng2 = PWM_MAX;
 	}
-	TIM_SetCompare2(TIM4, eng2*10);
+	TIM_SetCompare2(TIM4, eng2);
 
 	if (eng3 < PWM_MIN) {
 		eng3 = PWM_MIN;
@@ -130,7 +156,7 @@ void setPwm(uint8_t eng1, uint8_t eng2, uint8_t eng3, uint8_t eng4) {
 	if (eng3 > PWM_MAX) {
 		eng3 = PWM_MAX;
 	}
-	TIM_SetCompare3(TIM4, eng3*10);
+	TIM_SetCompare3(TIM4, eng3);
 
 	if (eng4 < PWM_MIN) {
 		eng4 = PWM_MIN;
@@ -138,5 +164,5 @@ void setPwm(uint8_t eng1, uint8_t eng2, uint8_t eng3, uint8_t eng4) {
 	if (eng4 > PWM_MAX) {
 		eng4 = PWM_MAX;
 	}
-	TIM_SetCompare4(TIM4, eng4*10);
+	TIM_SetCompare4(TIM4, eng4);
 }

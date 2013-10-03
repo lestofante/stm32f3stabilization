@@ -53,7 +53,8 @@
 /* Private define ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 RCC_ClocksTypeDef RCC_Clocks;
-
+TIM_ICInitTypeDef  TIM_ICInitStructure;
+__IO uint32_t CCR1;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -71,6 +72,31 @@ int main(void) {
 	STM_EVAL_LEDInit(LED4);
 	STM_EVAL_LEDInit(LED5);
 	STM_EVAL_LEDInit(LED6);
+	STM_EVAL_LEDInit(LED7);
+	STM_EVAL_LEDInit(LED8);
+
+	init_pwm_tim2();
+
+	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
+	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
+	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+	TIM_ICInitStructure.TIM_ICFilter = 0x0;
+
+	TIM_PWMIConfig(TIM2, &TIM_ICInitStructure);
+
+	/* Select the TIM2 Input Trigger: TI2FP2 */
+	TIM_SelectInputTrigger(TIM2, TIM_TS_TI2FP2);
+
+	/* Select the slave Mode: Reset Mode */
+	TIM_SelectSlaveMode(TIM2, TIM_SlaveMode_Reset);
+	TIM_SelectMasterSlaveMode(TIM2,TIM_MasterSlaveMode_Enable);
+
+	/* TIM enable counter */
+	TIM_Cmd(TIM2, ENABLE);
+
+	/* Enable the CC2 Interrupt Request */
+	TIM_ITConfig(TIM2, TIM_IT_CC2, ENABLE);
 	/*
 	 STM_EVAL_LEDOff(LED3);
 	 STM_EVAL_LEDOff(LED4);
@@ -79,7 +105,7 @@ int main(void) {
 
 	//test();
 	init_pwm_tim4(); //50Hz pwm
-/*
+	/*
 	uint8_t pwmDeciso = PWM_MIN;
 	while(1){
 		pwmDeciso++;
@@ -89,7 +115,7 @@ int main(void) {
 		setPwm(pwmDeciso, pwmDeciso, pwmDeciso, pwmDeciso);
 		DelayMs(1000);
 	}
-*/
+	 */
 	/* Configure the USB */
 	USB_Config();
 
@@ -128,9 +154,11 @@ int main(void) {
 	float pid_out[4];
 	init(SAMPLE_PID);
 
-	addPid(&ypr[1], &yprFromRx[2], &pid_out[2], 100.0f, 0, 0, -300, 300);
+	addPid(&ypr[1], &yprFromRx[2], &pid_out[2], 60.0f, 0.0f, 0.0f, -300, 300);
 
 	while (1) {
+
+		USB_write((uint8_t*) &CCR1, 4, PWM);
 
 		if (Compass_ReadAcc(acc))
 			USB_write((uint8_t*) acc, 6, SENSOR_ACC);
@@ -160,9 +188,11 @@ int main(void) {
 
 		if(compute()){
 			lastTime = micros();
-			setPwm((poweFromRx+(int)pid_out[2])/10,(poweFromRx-(int)pid_out[2])/10,0,0);
+			int motRx = (poweFromRx+(int)pid_out[2]);
+			int motSx = (poweFromRx-(int)pid_out[2]);
+			setPwm(motRx,motSx,0,0);
 			char str[20];
-			int numChar = sprintf(str, "%d, %f, %f, %f", (poweFromRx+(int)pid_out[2])/10, ypr[1], yprFromRx[2], pid_out[2]);
+			int numChar = sprintf(str, "%d, %f, %f, %f", motRx, ypr[1], yprFromRx[2], pid_out[2]);
 			USB_write((uint8_t*) str, numChar+1, STRING);
 		}
 
