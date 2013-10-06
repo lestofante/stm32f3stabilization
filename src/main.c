@@ -183,7 +183,7 @@ int main(void) {
 
 
 			//don't use again those values
-			acc[0] = acc[1] = acc[2] = magne[0] = magne[1] = magne[2] = 0;
+			//acc[0] = acc[1] = acc[2] = magne[0] = magne[1] = magne[2] = 0;
 		}
 
 		if(compute()){

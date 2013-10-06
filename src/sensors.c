@@ -223,7 +223,7 @@ uint8_t Compass_ReadMag (uint16_t* pfData)
 		//LSM303DLHC_M_SENSITIVITY_Z_8_1Ga;
 	}
 
-	pfData[1]*= magnetometerZtoXY; //because Z has different sensitivity
+	//pfData[1]*= magnetometerZtoXY; //because Z has different sensitivity
 
 	return 1;
 }
