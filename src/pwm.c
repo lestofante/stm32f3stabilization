@@ -67,7 +67,7 @@ void init_pwm_tim4() {
 
 	uint16_t prescaler = (uint16_t) ((72000000 / 1000000) - 1); // Shooting for 1 MHz, (1us)
 
-	uint32_t pwm_period = 2000;
+	uint32_t pwm_period = 20000;
 
 	//  Enable the TIM4 peripherie
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
@@ -87,15 +87,10 @@ void init_pwm_tim4() {
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 
-	TIM_OCInitStructure.TIM_Pulse = 10; // preset pulse width 0..pwm_period
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; // Pulse polarity
+	TIM_OCInitStructure.TIM_Pulse = PWM_STOP; // preset pulse width 0..pwm_period
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low; // Pulse polarity
 	//	  TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;
 	TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Set;
-
-	// These settings must be applied on the timer 1.
-	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Disable;
-	TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_Low;
-	TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Set;
 
 	// Setup four channels
 	// Channel 1, pin PD10?

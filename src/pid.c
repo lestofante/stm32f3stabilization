@@ -60,7 +60,7 @@ struct PidStruct* addPid(float *in, float *set, float *out, float kp, float ki, 
  *   pid Output needs to be computed.  returns true when the output is computed,
  *   false when nothing has been done.
  **********************************************************************************/
-uint8_t compute(){
+uint8_t computePid(){
 
 	unsigned long now = micros();
 	unsigned long timeChange = (now - lastTimePID);

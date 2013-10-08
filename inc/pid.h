@@ -45,6 +45,6 @@ uint32_t SampleTimePID; //10ms
 
 extern void init(uint32_t sample_time);
 extern struct PidStruct* addPid(float *in, float *set, float *out, float kp, float ki, float kd, float outMin, float outMax);
-extern uint8_t compute();
+extern uint8_t computePid();
 
 #endif /* PID_H_ */

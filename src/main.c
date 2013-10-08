@@ -37,7 +37,7 @@
 #include <stdlib.h>
 
 #define gyroToRad (2293.76/32768)*0.0174532925
-#define SAMPLE_PID 50000
+#define SAMPLE_PID 5000
 
 //#include "arm_math.h"
 
@@ -147,14 +147,14 @@ int main(void) {
 	int result = 0;
 
 	float yprFromRx[] = {0,0,0}; //this data will come from RX
-	uint16_t poweFromRx = 1200; // actually can go from 0 to 100 (MAX_PWM-MIN_PWM)
+	uint16_t poweFromRx = 1100; // actually can go from 0 to 100 (MAX_PWM-MIN_PWM)
 	int lastTime;
 
 	float ypr[3];
 	float pid_out[4];
 	init(SAMPLE_PID);
 
-	addPid(&ypr[1], &yprFromRx[2], &pid_out[2], 60.0f, 0.0f, 0.0f, -300, 300);
+	addPid(&ypr[1], &yprFromRx[2], &pid_out[2], 40.0f, 0.1f, 0.0f, -300, 300);
 
 	while (1) {
 
@@ -181,18 +181,24 @@ int main(void) {
 
 			USB_write((uint8_t*) ypr, sizeof(float)*3, ANGLE);
 
-
+			computePid();//compute PID
 			//don't use again those values
 			//acc[0] = acc[1] = acc[2] = magne[0] = magne[1] = magne[2] = 0;
 		}
 
-		if(compute()){
-			lastTime = micros();
-			int motRx = (poweFromRx+(int)pid_out[2]);
-			int motSx = (poweFromRx-(int)pid_out[2]);
+		unsigned long now = micros();
+		unsigned long timeChange = (now - lastTimePPM);
+		//all PPM has the same update time! 100.000 Hz
+		if(timeChange>=100000UL){
+			lastTimePPM = micros();
+			int pid2 = pid_out[2]; //esc seems to fuck up with small step
+
+			int motRx = (poweFromRx + pid2);
+			int motSx = (poweFromRx - pid2);
+
 			setPwm(motRx,motSx,0,0);
 			char str[20];
-			int numChar = sprintf(str, "%d, %f, %f, %f", motRx, ypr[1], yprFromRx[2], pid_out[2]);
+			int numChar = sprintf(str, "rx %d sx %d - %d", motRx, motSx, pid2);
 			USB_write((uint8_t*) str, numChar+1, STRING);
 		}
 
