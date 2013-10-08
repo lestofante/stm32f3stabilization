@@ -18,7 +18,7 @@ void init(uint32_t sample_time){
 }
 
 
-struct PidStruct* addPid(float *in, float *set, float *out, float kp, float ki, float kd, float outMin, float outMax){
+struct PidStruct* addPid(float *in, float *set, float *out, float *kp, float *ki, float *kd, float outMin, float outMax){
 
 	struct PidStruct *pidStruct;
 /*
@@ -79,7 +79,7 @@ uint8_t computePid(){
 			//Compute all the working error variables
 			float input = *(pidStruct->myInput);
 			float error = *(pidStruct->mySetpoint) - input;
-			pidStruct->ITerm+= (pidStruct->ki * error);
+			pidStruct->ITerm+= ( *(pidStruct->ki) * error);
 
 			//prevent integral windup
 			if(pidStruct->ITerm > pidStruct->outMax)
@@ -90,7 +90,7 @@ uint8_t computePid(){
 			float dInput = (input - pidStruct->lastInput);
 
 			//Compute PID Output
-			float output = pidStruct->kp * error + pidStruct->ITerm- pidStruct->kd * dInput;
+			float output = *(pidStruct->kp) * error + pidStruct->ITerm- *(pidStruct->kd) * dInput;
 
 			//constrains value, prevent pid overshoot
 			if(output > pidStruct->outMax)

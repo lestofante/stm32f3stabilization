@@ -143,20 +143,58 @@ int main(void) {
 
 	uint16_t gyro[3], acc[3], magne[3];
 	float quaternion[4];
-	uint8_t test[4];
-	int result = 0;
+	//uint8_t test[4];
+	//int result = 0;
 
 	float yprFromRx[] = {0,0,0}; //this data will come from RX
 	uint16_t poweFromRx = 1100; // actually can go from 0 to 100 (MAX_PWM-MIN_PWM)
-	int lastTime;
 
 	float ypr[3];
 	float pid_out[4];
 	init(SAMPLE_PID);
 
-	addPid(&ypr[1], &yprFromRx[2], &pid_out[2], 40.0f, 0.1f, 0.0f, -300, 300);
+	unsigned long lastTimePPM = 0;
+
+	float PID[3] = {60, 0, 0};
+
+	addPid(&ypr[1], &yprFromRx[2], &pid_out[2], &PID[0], &PID[1], &PID[2], -300, 300); //all pid are the same!
+
+	uint8_t tmpRead[200], countTmpRead = 0, indTmpRead=0, nextByte;
 
 	while (1) {
+
+		countTmpRead = USB_read(tmpRead);
+		indTmpRead = 0;
+		while ( countTmpRead-indTmpRead >= 5 ){
+			nextByte = tmpRead[indTmpRead++];
+
+			union {
+				uint8_t bytes[4];
+			    float f;
+			} byteToFloat;
+
+			uint8_t i;
+			for (i=0; i<4;i++){
+				byteToFloat.bytes[i] = tmpRead[indTmpRead++];
+			}
+			switch( nextByte ){
+			case 'P':
+				PID[0] = byteToFloat.f;
+				break;
+			case 'I':
+				PID[1] = byteToFloat.f;
+				break;
+			case 'D':
+				PID[2] = byteToFloat.f;
+				break;
+			case 'E':
+				poweFromRx = byteToFloat.f;
+				break;
+			}
+			char str[20];
+			int numChar = sprintf(str, "E %d PID %f %f %f", poweFromRx, PID[0], PID[1], PID[2]);
+			USB_write((uint8_t*) str, numChar+1, STRING);
+		}
 
 		USB_write((uint8_t*) &CCR1, 4, PWM);
 
@@ -202,7 +240,7 @@ int main(void) {
 			USB_write((uint8_t*) str, numChar+1, STRING);
 		}
 
-		result = USB_read(test);
+		//result = USB_read(test);
 	}
 }
 
