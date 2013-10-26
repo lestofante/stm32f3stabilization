@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file    USB_Example/hw_config.h
+  * @file    usb_pwr.h
   * @author  MCD Application Team
-  * @version V1.1.0
-  * @date    20-September-2012
-  * @brief   Hardware Configuration & Setup.
+  * @version V4.0.0
+  * @date    21-January-2013
+  * @brief   Connection/disconnection & power management header
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2013 STMicroelectronics</center></h2>
   *
   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
   * You may not use this file except in compliance with the License.
@@ -25,42 +25,48 @@
   ******************************************************************************
   */
 
+
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __HW_CONFIG_H
-#define __HW_CONFIG_H
+#ifndef __USB_PWR_H
+#define __USB_PWR_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "usb_type.h"
-#ifdef STM32F30X
- #include "stm32f30x.h"
-#endif /* STM32F30X */
-
 /* Exported types ------------------------------------------------------------*/
+typedef enum _RESUME_STATE
+{
+  RESUME_EXTERNAL,
+  RESUME_INTERNAL,
+  RESUME_LATER,
+  RESUME_WAIT,
+  RESUME_START,
+  RESUME_ON,
+  RESUME_OFF,
+  RESUME_ESOF
+} RESUME_STATE;
+
+typedef enum _DEVICE_STATE
+{
+  UNCONNECTED,
+  ATTACHED,
+  POWERED,
+  SUSPENDED,
+  ADDRESSED,
+  CONFIGURED
+} DEVICE_STATE;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
-/* Exported define -----------------------------------------------------------*/
-#define CURSOR_STEP     20
-
-#define DOWN            1
-#define LEFT            2
-#define RIGHT           3
-#define UP              4
-
-#define BUFFER_SIZE 64
-
-
 /* Exported functions ------------------------------------------------------- */
-void Set_System(void);
-void Set_USBClock(void);
-void GPIO_AINConfig(void);
-void Enter_LowPowerMode(void);
-void Leave_LowPowerMode(void);
-void USB_Interrupts_Config(void);
-void USB_Cable_Config (FunctionalState NewState);
-void Joystick_Send(uint8_t Keys);
-uint8_t JoyState(void);
-void Get_SerialNum(void);
+void Suspend(void);
+void Resume_Init(void);
+void Resume(RESUME_STATE eResumeSetVal);
+RESULT PowerOn(void);
+RESULT PowerOff(void);
 
-#endif  /*__HW_CONFIG_H*/
+/* External variables --------------------------------------------------------*/
+extern  __IO uint32_t bDeviceState; /* USB device status */
+extern __IO bool fSuspendEnabled;  /* true when suspend is possible */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/ 
+#endif  /*__USB_PWR_H*/
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

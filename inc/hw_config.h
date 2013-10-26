@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file    USB_Example/main.h 
+  * @file    hw_config.h
   * @author  MCD Application Team
-  * @version V1.1.0
-  * @date    20-September-2012
-  * @brief   Header for main.c module
+  * @version V4.0.0
+  * @date    21-January-2013
+  * @brief   Hardware Configuration & Setup
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2013 STMicroelectronics</center></h2>
   *
   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
   * You may not use this file except in compliance with the License.
@@ -24,35 +24,37 @@
   *
   ******************************************************************************
   */
-  
+
+
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __HW_CONFIG_H
+#define __HW_CONFIG_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f30x.h"
-#include "stm32f3_discovery.h"
-#include <stdio.h>
-#include "stm32f3_discovery_lsm303dlhc.h"
-#include "usb_lib.h"
-#include "hw_config.h"
-#include "usb_pwr.h"
 #include "platform_config.h"
-#include <math.h>
-#include "usb_istr.h"
-#include "stm32f30x_it.h"
-#include "usb_desc.h"
-#include "pid.h"
-
+#include "usb_type.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
+/* Exported define -----------------------------------------------------------*/
+#define MASS_MEMORY_START     0x04002000
+#define BULK_MAX_PACKET_SIZE  0x00000040
+#define LED_ON                0xF0
+#define LED_OFF               0xFF
+
 /* Exported functions ------------------------------------------------------- */
-void USB_Config (void);
-void Acc_Config(void);
-void Acc_ReadData(float* pfData);
+void Set_System(void);
+void Set_USBClock(void);
+void Enter_LowPowerMode(void);
+void Leave_LowPowerMode(void);
+void USB_Interrupts_Config(void);
+void USB_Cable_Config (FunctionalState NewState);
+void Get_SerialNum(void);
+void LCD_Control(void);
+uint32_t CDC_Send_DATA (uint8_t *ptrBuffer, uint8_t Send_length);
+uint32_t CDC_Receive_DATA(void);
+/* External variables --------------------------------------------------------*/
 
-#endif /* __MAIN_H */
-
+#endif  /*__HW_CONFIG_H*/
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

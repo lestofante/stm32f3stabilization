@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file    USB_Example/stm32f30x_it.h 
+  * @file    stm32_it.h
   * @author  MCD Application Team
-  * @version V1.1.0
-  * @date    20-September-2012
+  * @version V4.0.0
+  * @date    21-January-2013
   * @brief   This file contains the headers of the interrupt handlers.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2013 STMicroelectronics</center></h2>
   *
   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
   * You may not use this file except in compliance with the License.
@@ -25,16 +25,13 @@
   ******************************************************************************
   */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F30X_IT_H
-#define __STM32F30X_IT_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif 
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __STM32_IT_H
+#define __STM32_IT_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f30x.h"
+#include "platform_config.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -50,19 +47,9 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
-
-void USB_LP_CAN1_RX0_IRQHandler(void);
-void USB_LP_IRQHandler(void);
 void USBWakeUp_IRQHandler(void);
-void USBWakeUp_RMP_IRQHandler(void);
+void USB_FS_WKUP_IRQHandler(void);
 
-#ifdef __cplusplus
-}
-#endif
+#endif /* __STM32_IT_H */
 
-#endif /* __STM32F30X_IT_H */
-
- /*Exported variables*/
- extern __IO uint32_t IC2Value;
- extern __IO uint32_t CCR1;
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
