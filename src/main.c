@@ -162,7 +162,6 @@ int main(void) {
 	uint8_t tmpRead[200], countTmpRead = 0, indTmpRead=0, nextByte;
 
 	while (1) {
-
 		countTmpRead = USB_read(tmpRead);
 		indTmpRead = 0;
 		while ( countTmpRead-indTmpRead >= 5 ){
@@ -212,8 +211,6 @@ int main(void) {
 			getQuaternion(quaternion);
 
 			USB_write((uint8_t*) quaternion, sizeof(float)*4, DCM);
-
-
 
 			quaternionToYawPitchRoll(ypr);
 

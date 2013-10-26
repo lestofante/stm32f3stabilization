@@ -39,7 +39,7 @@
 /* EP_NUM */
 /* defines how many endpoints are used by the device */
 /*-------------------------------------------------------------*/
-#define EP_NUM     (2)
+#define EP_NUM     (3)
 
 /*-------------------------------------------------------------*/
 /* --------------   Buffer Description Table  -----------------*/

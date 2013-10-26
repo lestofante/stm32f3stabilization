@@ -49,7 +49,9 @@ void USB_write(uint8_t* toWrite, uint16_t size, enum packet_type_t raw_type){
 
 int USB_read(uint8_t* ptr){
 	if(DATA_PRESENT){
-		return USB_SIL_Read(EP2_OUT, ptr);
+		uint32_t out = USB_SIL_Read(EP2_OUT, ptr);
+		SetEPRxValid(ENDP2);
+		return out;
 	} else {
 		return 0;
 	}
