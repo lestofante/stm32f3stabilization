@@ -239,7 +239,6 @@ int main(void) {
 			int numChar = sprintf(str, "rx %d sx %d - %d", motRx, motSx, pid2);
 			USB_write((uint8_t*) str, numChar+1, STRING);
 		}
-
 		//result = USB_read(test);
 	}
 }

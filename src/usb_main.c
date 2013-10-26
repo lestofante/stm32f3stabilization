@@ -67,6 +67,7 @@ void USB_Config(void)
 	USB_Interrupts_Config();
 
 	USB_Init();
+	USB_SIL_Init();
 
 	while (bDeviceState != CONFIGURED)
 	{}
