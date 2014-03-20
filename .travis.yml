@@ -1,7 +1,6 @@
 language: c
 compiler:
-  - gcc
-  - clang
+  - arm-none-eabi-gcc
   
 script:
   - make
